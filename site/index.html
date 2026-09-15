@@ -1,0 +1,662 @@
+<!doctype html>
+<title>2026-27 Match Predictions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F7F1;
+    --surface: #FFFFFF;
+    --surface-2: #ECEFE4;
+    --border: #DBE0D1;
+    --text: #1B2117;
+    --text-muted: #5C6656;
+    --accent: #2E6B4E;
+    --accent-strong: #1C4531;
+    --accent-soft: #E4EDE6;
+    --home: #2E6B4E;
+    --away: #A8722F;
+    --draw: #7B8574;
+    --baseline: #B0532E;
+    --zone-top4: #2E6B4E;
+    --zone-releg: #B23B3B;
+    --shadow: 0 1px 2px rgba(27,33,23,0.06), 0 1px 1px rgba(27,33,23,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10140D;
+      --surface: #171C13;
+      --surface-2: #1E251A;
+      --border: #2B3326;
+      --text: #E8ECDF;
+      --text-muted: #94A088;
+      --accent: #56AC80;
+      --accent-strong: #79CBA0;
+      --accent-soft: #1E2E23;
+      --home: #56AC80;
+      --away: #DDA562;
+      --draw: #93A088;
+      --baseline: #E28E60;
+      --zone-top4: #56AC80;
+      --zone-releg: #D9756E;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 1px 1px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10140D;
+    --surface: #171C13;
+    --surface-2: #1E251A;
+    --border: #2B3326;
+    --text: #E8ECDF;
+    --text-muted: #94A088;
+    --accent: #56AC80;
+    --accent-strong: #79CBA0;
+    --accent-soft: #1E2E23;
+    --home: #56AC80;
+    --away: #DDA562;
+    --draw: #93A088;
+    --baseline: #E28E60;
+    --zone-top4: #56AC80;
+    --zone-releg: #D9756E;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 1px 1px rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 0 16px 64px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header.page {
+    padding: 32px 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: "Oswald", ui-sans-serif, sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 38px);
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: 0.01em;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  .model-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .model-stats .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 108px;
+  }
+  .model-stats .stat .label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .model-stats .stat .value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding-top: 6px;
+  }
+  .tabs button {
+    font: inherit;
+    font-family: "Oswald", sans-serif;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 4px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tabs button.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: 14px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .toolbar input[type="search"],
+  .toolbar select {
+    font: inherit;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 12px;
+  }
+  .toolbar input[type="search"] { flex: 1 1 200px; min-width: 0; }
+  .toolbar select { flex: 0 0 auto; }
+  .toolbar input::placeholder { color: var(--text-muted); }
+  .toolbar input:focus, .toolbar select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-muted);
+    align-items: center;
+    padding-bottom: 16px;
+  }
+  .legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
+  details.gw {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  details.gw[hidden] { display: none; }
+  details.gw summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: "Oswald", sans-serif;
+    background: var(--surface-2);
+    user-select: none;
+  }
+  details.gw summary::-webkit-details-marker { display: none; }
+  details.gw summary .gwnum {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  details.gw summary .gwdate {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  details.gw summary .chev {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: "IBM Plex Mono", monospace;
+  }
+  details.gw[open] summary .chev::before { content: "\2212"; }
+  details.gw:not([open]) summary .chev::before { content: "+"; }
+
+  .match {
+    display: grid;
+    grid-template-columns: 60px 1fr auto 1fr 128px;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .match[hidden] { display: none; }
+  .match .date {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+  .side { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .side.away { justify-content: flex-end; text-align: right; flex-direction: row-reverse; }
+  .code {
+    font-family: "Oswald", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border-radius: 5px;
+    padding: 2px 6px;
+    flex: none;
+  }
+  .name { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .baseline-flag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9.5px;
+    color: var(--baseline);
+    border: 1px solid var(--baseline);
+    border-radius: 4px;
+    padding: 0 3px;
+    line-height: 1.4;
+    flex: none;
+  }
+
+  .score {
+    font-family: "Oswald", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 7px;
+    padding: 4px 10px;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .probs { display: flex; flex-direction: column; gap: 4px; }
+  .bar {
+    height: 7px;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    background: var(--surface-2);
+  }
+  .bar span { height: 100%; }
+  .bar .h { background: var(--home); }
+  .bar .d { background: var(--draw); }
+  .bar .a { background: var(--away); }
+  .problabels {
+    display: flex;
+    justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+  .problabels b { color: var(--text); font-weight: 500; }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .table-head, .table-row {
+    display: grid;
+    grid-template-columns: 34px 1fr 56px 56px 72px 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+  .table-head {
+    background: var(--surface-2);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+  .table-row { border-top: 1px solid var(--border); border-left: 3px solid transparent; }
+  .table-row.zone-top4 { border-left-color: var(--zone-top4); }
+  .table-row.zone-releg { border-left-color: var(--zone-releg); }
+  .table-row .rank {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .table-row .team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .table-row .team .name { font-size: 14.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .table-row .pts {
+    font-family: "Oswald", sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+  .table-row .gd {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .table-row .pos {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .odds { display: flex; gap: 6px; flex-wrap: wrap; }
+  .odds .chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    border-radius: 5px;
+    padding: 2px 6px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .odds .chip.on { color: var(--text); }
+  .odds .chip.title.on { background: color-mix(in srgb, var(--accent) 20%, var(--surface-2)); color: var(--accent-strong); }
+  .odds .chip.top4.on { background: color-mix(in srgb, var(--zone-top4) 16%, var(--surface-2)); color: var(--zone-top4); }
+  .odds .chip.releg.on { background: color-mix(in srgb, var(--zone-releg) 18%, var(--surface-2)); color: var(--zone-releg); }
+  .table-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 2px 18px;
+  }
+
+  @media (max-width: 560px) {
+    .table-head { display: none; }
+    .table-row { grid-template-columns: 26px 1fr 44px; grid-template-areas: "rank team pts" "odds odds odds" "gd gd gd"; row-gap: 4px; }
+    .table-row .rank { grid-area: rank; }
+    .table-row .team { grid-area: team; }
+    .table-row .pts { grid-area: pts; text-align: right; }
+    .table-row .gd { grid-area: gd; }
+    .table-row .odds { grid-area: odds; }
+    .table-row .pos { display: none; }
+  }
+
+  .empty-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  footer.page {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  footer.page a { color: var(--accent); }
+
+  @media (max-width: 560px) {
+    .match {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .match .date { order: -1; }
+    .score { justify-self: center; }
+    .side.away { flex-direction: row; justify-content: flex-start; text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="page">
+    <span class="eyebrow">Static Score Predictor &middot; Dixon-Coles MLE</span>
+    <h1>Premier League 2026&ndash;27 Predictions</h1>
+    <p class="subtitle">
+      Every one of the season's 380 fixtures, scored by a Dixon-Coles attack/defense
+      model fit on 2023&ndash;24 through 2025&ndash;26 results (exponential time decay,
+      &xi;=0.0065/day). The fixture list itself is the real official 2026&ndash;27
+      schedule &mdash; not a simulated round robin.
+    </p>
+    <div class="model-stats" id="modelStats"></div>
+    <div class="tabs" role="tablist">
+      <button type="button" id="tabFixtures" class="active" role="tab" aria-selected="true">Fixtures</button>
+      <button type="button" id="tabTable" role="tab" aria-selected="false">Projected Table</button>
+    </div>
+  </header>
+
+  <div class="toolbar" id="fixturesToolbar">
+    <input type="search" id="search" placeholder="Search a team&hellip;" aria-label="Search by team">
+    <select id="gwJump" aria-label="Jump to gameweek"></select>
+  </div>
+  <div class="legend" id="fixturesLegend">
+    <span><span class="dot" style="background:var(--home)"></span>Home win</span>
+    <span><span class="dot" style="background:var(--draw)"></span>Draw</span>
+    <span><span class="dot" style="background:var(--away)"></span>Away win</span>
+    <span><span class="baseline-flag" style="padding:1px 4px;">NEW</span>&nbsp;No recent PL history &mdash; 18th-place baseline rating</span>
+  </div>
+
+  <main id="list"></main>
+  <p class="empty-msg" id="emptyMsg" hidden>No fixtures match &ldquo;<span id="emptyQuery"></span>&rdquo;.</p>
+
+  <section id="tableView" hidden>
+    <div class="legend" style="padding-top:0;">
+      <span><span class="dot" style="background:var(--zone-top4)"></span>Champions League (top 4)</span>
+      <span><span class="dot" style="background:var(--zone-releg)"></span>Relegation (bottom 3)</span>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <span>#</span><span>Team</span><span>Pts</span><span>GD</span><span>Avg. pos</span><span>Odds (Title / Top&nbsp;4 / Releg.)</span>
+      </div>
+      <div id="tableBody"></div>
+    </div>
+    <p class="table-note">
+      Projected by simulating the remaining Dixon-Coles score distribution for
+      all 380 fixtures 20,000 times and averaging the resulting final tables
+      &mdash; not a single deterministic outcome. "Avg. pos" is the mean finishing
+      position across simulations, which is why it's fractional.
+    </p>
+  </section>
+
+  <footer class="page">
+    Model: home advantage and low-score correlation (&rho;) fitted by maximum
+    likelihood; Coventry and Hull (no 2023&ndash;26 top-flight data) are rated at
+    the average attack/defense strength of each training season's 18th-place
+    finisher. Fixture list cross-checked against recorded 2026&ndash;27 results
+    for gameweeks 1&ndash;2 (exact match). Source data:
+    <a href="https://www.football-data.co.uk/englandm.php" target="_blank" rel="noopener">football-data.co.uk</a>.
+  </footer>
+</div>
+
+<script>
+(async function () {
+  const [predRes, tableRes] = await Promise.all([
+    fetch("predictions.json"),
+    fetch("table.json"),
+  ]);
+  const rows = await predRes.json();
+  const table = await tableRes.json();
+
+  const byGw = new Map();
+  for (const r of rows) {
+    if (!byGw.has(r.gw)) byGw.set(r.gw, []);
+    byGw.get(r.gw).push(r);
+  }
+  const gws = [...byGw.keys()].sort((a, b) => a - b);
+
+  // model stats strip
+  const homeAdvWinRate = rows.length
+    ? (rows.reduce((s, r) => s + r.ph, 0) / rows.length).toFixed(1)
+    : "-";
+  const stats = [
+    ["Fixtures", rows.length],
+    ["Gameweeks", gws.length],
+    ["Avg. home win", homeAdvWinRate + "%"],
+    ["Training seasons", "3"],
+  ];
+  document.getElementById("modelStats").innerHTML = stats.map(
+    ([label, value]) => `<div class="stat"><span class="label">${label}</span><span class="value">${value}</span></div>`
+  ).join("");
+
+  function fmtDate(iso) {
+    if (!iso) return "";
+    const d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function matchRow(r) {
+    const el = document.createElement("div");
+    el.className = "match";
+    el.dataset.teams = (r.h + " " + r.a + " " + r.hc + " " + r.ac).toLowerCase();
+    el.innerHTML = `
+      <span class="date">${fmtDate(r.date)}</span>
+      <span class="side home">
+        <span class="code">${r.hc}</span>
+        <span class="name">${r.h}</span>
+        ${r.hb ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+      </span>
+      <span class="score">${r.score}</span>
+      <span class="side away">
+        <span class="code">${r.ac}</span>
+        <span class="name">${r.a}</span>
+        ${r.ab ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+      </span>
+      <span class="probs">
+        <span class="bar">
+          <span class="h" style="width:${r.ph}%"></span>
+          <span class="d" style="width:${r.pd}%"></span>
+          <span class="a" style="width:${r.pa}%"></span>
+        </span>
+        <span class="problabels">
+          <span title="${r.h} win"><b>${r.ph.toFixed(0)}</b>H</span>
+          <span title="Draw"><b>${r.pd.toFixed(0)}</b>D</span>
+          <span title="${r.a} win"><b>${r.pa.toFixed(0)}</b>A</span>
+        </span>
+      </span>
+    `;
+    return el;
+  }
+
+  const list = document.getElementById("list");
+  const frag = document.createDocumentFragment();
+  for (const gw of gws) {
+    const matches = byGw.get(gw);
+    const details = document.createElement("details");
+    details.className = "gw";
+    details.id = "gw-" + gw;
+    if (gw === 1) details.open = true;
+
+    const dates = matches.map((m) => m.date).sort();
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span class="gwnum">Gameweek ${gw}</span><span class="gwdate">${fmtDate(dates[0])}${dates[0] !== dates[dates.length - 1] ? " – " + fmtDate(dates[dates.length - 1]) : ""}</span><span class="chev"></span>`;
+    details.appendChild(summary);
+
+    for (const m of matches) details.appendChild(matchRow(m));
+    frag.appendChild(details);
+  }
+  list.appendChild(frag);
+
+  // gameweek jump
+  const gwJump = document.getElementById("gwJump");
+  gwJump.innerHTML = `<option value="">Jump to gameweek&hellip;</option>` +
+    gws.map((gw) => `<option value="${gw}">GW ${gw}</option>`).join("");
+  gwJump.addEventListener("change", () => {
+    if (!gwJump.value) return;
+    const target = document.getElementById("gw-" + gwJump.value);
+    if (target) {
+      target.open = true;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    gwJump.value = "";
+  });
+
+  // search filter
+  const search = document.getElementById("search");
+  const emptyMsg = document.getElementById("emptyMsg");
+  const emptyQuery = document.getElementById("emptyQuery");
+  function applySearch() {
+    const q = search.value.trim().toLowerCase();
+    let anyVisible = false;
+    for (const gw of gws) {
+      const details = document.getElementById("gw-" + gw);
+      let groupHasMatch = false;
+      details.querySelectorAll(".match").forEach((row) => {
+        const match = !q || row.dataset.teams.includes(q);
+        row.hidden = !match;
+        if (match) groupHasMatch = true;
+      });
+      details.hidden = !groupHasMatch;
+      if (groupHasMatch) {
+        anyVisible = true;
+        if (q) details.open = true;
+      }
+    }
+    emptyMsg.hidden = anyVisible || !q;
+    emptyQuery.textContent = search.value.trim();
+  }
+  search.addEventListener("input", applySearch);
+
+  // projected table
+  const n = table.length;
+  const tableBody = document.getElementById("tableBody");
+  const tfrag = document.createDocumentFragment();
+  for (const t of table) {
+    const row = document.createElement("div");
+    row.className = "table-row";
+    if (t.rank <= 4) row.classList.add("zone-top4");
+    if (t.rank > n - 3) row.classList.add("zone-releg");
+    row.innerHTML = `
+      <span class="rank">${t.rank}</span>
+      <span class="team">
+        <span class="code">${t.code}</span>
+        <span class="name">${t.team}</span>
+        ${t.new ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+      </span>
+      <span class="pts">${t.pts}</span>
+      <span class="gd">${t.gd > 0 ? "+" : ""}${t.gd}</span>
+      <span class="pos">${t.pos.toFixed(2)}</span>
+      <span class="odds">
+        <span class="chip title ${t.title >= 0.5 ? "on" : ""}">${t.title >= 0.1 ? t.title.toFixed(1) : "<0.1"}% title</span>
+        <span class="chip top4 ${t.top4 >= 0.5 ? "on" : ""}">${t.top4.toFixed(1)}% top4</span>
+        <span class="chip releg ${t.releg >= 0.5 ? "on" : ""}">${t.releg.toFixed(1)}% releg.</span>
+      </span>
+    `;
+    tfrag.appendChild(row);
+  }
+  tableBody.appendChild(tfrag);
+
+  // tab switching
+  const tabFixtures = document.getElementById("tabFixtures");
+  const tabTable = document.getElementById("tabTable");
+  const fixturesToolbar = document.getElementById("fixturesToolbar");
+  const fixturesLegend = document.getElementById("fixturesLegend");
+  const tableView = document.getElementById("tableView");
+
+  function showFixtures() {
+    tabFixtures.classList.add("active"); tabFixtures.setAttribute("aria-selected", "true");
+    tabTable.classList.remove("active"); tabTable.setAttribute("aria-selected", "false");
+    fixturesToolbar.hidden = false; fixturesLegend.hidden = false; list.hidden = false;
+    applySearch();
+    tableView.hidden = true;
+  }
+  function showTable() {
+    tabTable.classList.add("active"); tabTable.setAttribute("aria-selected", "true");
+    tabFixtures.classList.remove("active"); tabFixtures.setAttribute("aria-selected", "false");
+    fixturesToolbar.hidden = true; fixturesLegend.hidden = true; list.hidden = true;
+    emptyMsg.hidden = true;
+    tableView.hidden = false;
+  }
+  tabFixtures.addEventListener("click", showFixtures);
+  tabTable.addEventListener("click", showTable);
+})();
+</script>

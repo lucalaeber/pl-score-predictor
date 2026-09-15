@@ -1,0 +1,2282 @@
+[
+ {
+  "home": "arsenal",
+  "away": "coventry-city",
+  "week": 1,
+  "date": "2026-08-21"
+ },
+ {
+  "home": "hull-city",
+  "away": "manchester-united",
+  "week": 1,
+  "date": "2026-08-22"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "leeds-united",
+  "week": 1,
+  "date": "2026-08-22"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "sunderland",
+  "week": 1,
+  "date": "2026-08-22"
+ },
+ {
+  "home": "everton",
+  "away": "crystal-palace",
+  "week": 1,
+  "date": "2026-08-22"
+ },
+ {
+  "home": "brentford",
+  "away": "tottenham-hotspur",
+  "week": 1,
+  "date": "2026-08-22"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "aston-villa",
+  "week": 1,
+  "date": "2026-08-23"
+ },
+ {
+  "home": "manchester-city",
+  "away": "afc-bournemouth",
+  "week": 1,
+  "date": "2026-08-23"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "liverpool",
+  "week": 1,
+  "date": "2026-08-23"
+ },
+ {
+  "home": "fulham",
+  "away": "chelsea",
+  "week": 1,
+  "date": "2026-08-24"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "manchester-city",
+  "week": 2,
+  "date": "2026-08-28"
+ },
+ {
+  "home": "liverpool",
+  "away": "nottingham-forest",
+  "week": 2,
+  "date": "2026-08-29"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "everton",
+  "week": 2,
+  "date": "2026-08-29"
+ },
+ {
+  "home": "coventry-city",
+  "away": "hull-city",
+  "week": 2,
+  "date": "2026-08-29"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "newcastle-united",
+  "week": 2,
+  "date": "2026-08-29"
+ },
+ {
+  "home": "sunderland",
+  "away": "fulham",
+  "week": 2,
+  "date": "2026-08-30"
+ },
+ {
+  "home": "leeds-united",
+  "away": "brentford",
+  "week": 2,
+  "date": "2026-08-30"
+ },
+ {
+  "home": "chelsea",
+  "away": "brighton-and-hove-albion",
+  "week": 2,
+  "date": "2026-08-30"
+ },
+ {
+  "home": "manchester-united",
+  "away": "ipswich-town",
+  "week": 2,
+  "date": "2026-08-30"
+ },
+ {
+  "home": "aston-villa",
+  "away": "arsenal",
+  "week": 2,
+  "date": "2026-08-31"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "liverpool",
+  "week": 3,
+  "date": "2026-09-04"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "afc-bournemouth",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "tottenham-hotspur",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "manchester-city",
+  "away": "coventry-city",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "fulham",
+  "away": "crystal-palace",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "leeds-united",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "brentford",
+  "away": "sunderland",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "hull-city",
+  "away": "aston-villa",
+  "week": 3,
+  "date": "2026-09-05"
+ },
+ {
+  "home": "everton",
+  "away": "manchester-united",
+  "week": 3,
+  "date": "2026-09-06"
+ },
+ {
+  "home": "arsenal",
+  "away": "chelsea",
+  "week": 3,
+  "date": "2026-09-06"
+ },
+ {
+  "home": "liverpool",
+  "away": "fulham",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "ipswich-town",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "chelsea",
+  "away": "hull-city",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "aston-villa",
+  "away": "nottingham-forest",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "brentford",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "everton",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "sunderland",
+  "away": "arsenal",
+  "week": 4,
+  "date": "2026-09-12"
+ },
+ {
+  "home": "coventry-city",
+  "away": "brighton-and-hove-albion",
+  "week": 4,
+  "date": "2026-09-13"
+ },
+ {
+  "home": "manchester-united",
+  "away": "manchester-city",
+  "week": 4,
+  "date": "2026-09-13"
+ },
+ {
+  "home": "leeds-united",
+  "away": "newcastle-united",
+  "week": 4,
+  "date": "2026-09-14"
+ },
+ {
+  "home": "brentford",
+  "away": "chelsea",
+  "week": 5,
+  "date": "2026-09-18"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "aston-villa",
+  "week": 5,
+  "date": "2026-09-19"
+ },
+ {
+  "home": "everton",
+  "away": "ipswich-town",
+  "week": 5,
+  "date": "2026-09-19"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "hull-city",
+  "week": 5,
+  "date": "2026-09-19"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "arsenal",
+  "week": 5,
+  "date": "2026-09-19"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "coventry-city",
+  "week": 5,
+  "date": "2026-09-19"
+ },
+ {
+  "home": "manchester-city",
+  "away": "sunderland",
+  "week": 5,
+  "date": "2026-09-20"
+ },
+ {
+  "home": "leeds-united",
+  "away": "crystal-palace",
+  "week": 5,
+  "date": "2026-09-20"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "liverpool",
+  "week": 5,
+  "date": "2026-09-20"
+ },
+ {
+  "home": "fulham",
+  "away": "manchester-united",
+  "week": 5,
+  "date": "2026-09-20"
+ },
+ {
+  "home": "arsenal",
+  "away": "leeds-united",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "sunderland",
+  "away": "brighton-and-hove-albion",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "chelsea",
+  "away": "afc-bournemouth",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "aston-villa",
+  "away": "brentford",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "fulham",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "manchester-united",
+  "away": "tottenham-hotspur",
+  "week": 6,
+  "date": "2026-10-10"
+ },
+ {
+  "home": "hull-city",
+  "away": "everton",
+  "week": 6,
+  "date": "2026-10-11"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "nottingham-forest",
+  "week": 6,
+  "date": "2026-10-11"
+ },
+ {
+  "home": "liverpool",
+  "away": "manchester-city",
+  "week": 6,
+  "date": "2026-10-11"
+ },
+ {
+  "home": "coventry-city",
+  "away": "newcastle-united",
+  "week": 6,
+  "date": "2026-10-12"
+ },
+ {
+  "home": "everton",
+  "away": "chelsea",
+  "week": 7,
+  "date": "2026-10-17"
+ },
+ {
+  "home": "fulham",
+  "away": "hull-city",
+  "week": 7,
+  "date": "2026-10-17"
+ },
+ {
+  "home": "manchester-city",
+  "away": "ipswich-town",
+  "week": 7,
+  "date": "2026-10-17"
+ },
+ {
+  "home": "brentford",
+  "away": "liverpool",
+  "week": 7,
+  "date": "2026-10-17"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "aston-villa",
+  "week": 7,
+  "date": "2026-10-17"
+ },
+ {
+  "home": "leeds-united",
+  "away": "manchester-united",
+  "week": 7,
+  "date": "2026-10-18"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "crystal-palace",
+  "week": 7,
+  "date": "2026-10-18"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "sunderland",
+  "week": 7,
+  "date": "2026-10-18"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "arsenal",
+  "week": 7,
+  "date": "2026-10-18"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "coventry-city",
+  "week": 7,
+  "date": "2026-10-19"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "nottingham-forest",
+  "week": 8,
+  "date": "2026-10-23"
+ },
+ {
+  "home": "aston-villa",
+  "away": "manchester-city",
+  "week": 8,
+  "date": "2026-10-24"
+ },
+ {
+  "home": "liverpool",
+  "away": "brighton-and-hove-albion",
+  "week": 8,
+  "date": "2026-10-24"
+ },
+ {
+  "home": "arsenal",
+  "away": "everton",
+  "week": 8,
+  "date": "2026-10-24"
+ },
+ {
+  "home": "coventry-city",
+  "away": "fulham",
+  "week": 8,
+  "date": "2026-10-24"
+ },
+ {
+  "home": "chelsea",
+  "away": "tottenham-hotspur",
+  "week": 8,
+  "date": "2026-10-24"
+ },
+ {
+  "home": "hull-city",
+  "away": "brentford",
+  "week": 8,
+  "date": "2026-10-25"
+ },
+ {
+  "home": "manchester-united",
+  "away": "afc-bournemouth",
+  "week": 8,
+  "date": "2026-10-25"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "newcastle-united",
+  "week": 8,
+  "date": "2026-10-25"
+ },
+ {
+  "home": "sunderland",
+  "away": "leeds-united",
+  "week": 8,
+  "date": "2026-10-25"
+ },
+ {
+  "home": "chelsea",
+  "away": "manchester-united",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "hull-city",
+  "away": "ipswich-town",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "manchester-city",
+  "away": "brighton-and-hove-albion",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "coventry-city",
+  "away": "sunderland",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "brentford",
+  "away": "nottingham-forest",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "leeds-united",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "crystal-palace",
+  "week": 9,
+  "date": "2026-10-31"
+ },
+ {
+  "home": "aston-villa",
+  "away": "fulham",
+  "week": 9,
+  "date": "2026-11-01"
+ },
+ {
+  "home": "liverpool",
+  "away": "arsenal",
+  "week": 9,
+  "date": "2026-11-01"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "everton",
+  "week": 9,
+  "date": "2026-11-02"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "manchester-city",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "leeds-united",
+  "away": "tottenham-hotspur",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "afc-bournemouth",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "arsenal",
+  "away": "hull-city",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "sunderland",
+  "away": "chelsea",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "manchester-united",
+  "away": "aston-villa",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "fulham",
+  "away": "newcastle-united",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "everton",
+  "away": "coventry-city",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "liverpool",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "brentford",
+  "week": 10,
+  "date": "2026-11-07"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "ipswich-town",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "liverpool",
+  "away": "manchester-united",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "aston-villa",
+  "away": "sunderland",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "arsenal",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "manchester-city",
+  "away": "fulham",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "hull-city",
+  "away": "brighton-and-hove-albion",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "coventry-city",
+  "away": "crystal-palace",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "chelsea",
+  "away": "leeds-united",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "brentford",
+  "away": "everton",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "nottingham-forest",
+  "week": 11,
+  "date": "2026-11-21"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "aston-villa",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "arsenal",
+  "away": "manchester-city",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "sunderland",
+  "away": "tottenham-hotspur",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "chelsea",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "manchester-united",
+  "away": "brentford",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "leeds-united",
+  "away": "coventry-city",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "fulham",
+  "away": "afc-bournemouth",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "everton",
+  "away": "liverpool",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "hull-city",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "newcastle-united",
+  "week": 12,
+  "date": "2026-11-28"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "fulham",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "brentford",
+  "away": "arsenal",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "aston-villa",
+  "away": "everton",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "manchester-united",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "manchester-city",
+  "away": "leeds-united",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "liverpool",
+  "away": "sunderland",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "hull-city",
+  "away": "nottingham-forest",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "coventry-city",
+  "away": "ipswich-town",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "chelsea",
+  "away": "crystal-palace",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "brighton-and-hove-albion",
+  "week": 13,
+  "date": "2026-12-02"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "brighton-and-hove-albion",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "sunderland",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "arsenal",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "manchester-united",
+  "away": "coventry-city",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "leeds-united",
+  "away": "ipswich-town",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "everton",
+  "away": "fulham",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "chelsea",
+  "away": "liverpool",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "brentford",
+  "away": "manchester-city",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "aston-villa",
+  "away": "crystal-palace",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "hull-city",
+  "week": 14,
+  "date": "2026-12-05"
+ },
+ {
+  "home": "sunderland",
+  "away": "nottingham-forest",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "manchester-city",
+  "away": "chelsea",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "liverpool",
+  "away": "leeds-united",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "newcastle-united",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "everton",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "arsenal",
+  "away": "afc-bournemouth",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "hull-city",
+  "away": "tottenham-hotspur",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "fulham",
+  "away": "brentford",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "manchester-united",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "coventry-city",
+  "away": "aston-villa",
+  "week": 15,
+  "date": "2026-12-12"
+ },
+ {
+  "home": "sunderland",
+  "away": "crystal-palace",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "ipswich-town",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "coventry-city",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "everton",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "manchester-city",
+  "away": "hull-city",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "liverpool",
+  "away": "tottenham-hotspur",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "leeds-united",
+  "away": "fulham",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "chelsea",
+  "away": "aston-villa",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "brentford",
+  "away": "newcastle-united",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "arsenal",
+  "away": "manchester-united",
+  "week": 16,
+  "date": "2026-12-19"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "afc-bournemouth",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "manchester-city",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "hull-city",
+  "away": "liverpool",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "fulham",
+  "away": "brighton-and-hove-albion",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "arsenal",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "coventry-city",
+  "away": "chelsea",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "aston-villa",
+  "away": "leeds-united",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "manchester-united",
+  "away": "nottingham-forest",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "brentford",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "everton",
+  "away": "sunderland",
+  "week": 17,
+  "date": "2026-12-26"
+ },
+ {
+  "home": "coventry-city",
+  "away": "brentford",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "brighton-and-hove-albion",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "nottingham-forest",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "manchester-united",
+  "away": "sunderland",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "chelsea",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "hull-city",
+  "away": "leeds-united",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "fulham",
+  "away": "arsenal",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "everton",
+  "away": "manchester-city",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "afc-bournemouth",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "aston-villa",
+  "away": "liverpool",
+  "week": 18,
+  "date": "2026-12-30"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "manchester-united",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "aston-villa",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "sunderland",
+  "away": "hull-city",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "fulham",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "manchester-city",
+  "away": "tottenham-hotspur",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "liverpool",
+  "away": "coventry-city",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "leeds-united",
+  "away": "everton",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "chelsea",
+  "away": "newcastle-united",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "brentford",
+  "away": "crystal-palace",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "arsenal",
+  "away": "ipswich-town",
+  "week": 19,
+  "date": "2027-01-02"
+ },
+ {
+  "home": "sunderland",
+  "away": "liverpool",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "hull-city",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "manchester-united",
+  "away": "newcastle-united",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "leeds-united",
+  "away": "manchester-city",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "coventry-city",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "fulham",
+  "away": "tottenham-hotspur",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "everton",
+  "away": "aston-villa",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "chelsea",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "afc-bournemouth",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "arsenal",
+  "away": "brentford",
+  "week": 20,
+  "date": "2027-01-06"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "fulham",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "manchester-city",
+  "away": "nottingham-forest",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "hull-city",
+  "away": "arsenal",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "coventry-city",
+  "away": "everton",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "aston-villa",
+  "away": "manchester-united",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "ipswich-town",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "leeds-united",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "liverpool",
+  "away": "crystal-palace",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "chelsea",
+  "away": "sunderland",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "brentford",
+  "away": "brighton-and-hove-albion",
+  "week": 21,
+  "date": "2027-01-16"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "afc-bournemouth",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "manchester-united",
+  "away": "liverpool",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "fulham",
+  "away": "aston-villa",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "arsenal",
+  "away": "newcastle-united",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "sunderland",
+  "away": "coventry-city",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "leeds-united",
+  "away": "chelsea",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "hull-city",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "everton",
+  "away": "brentford",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "tottenham-hotspur",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "manchester-city",
+  "week": 22,
+  "date": "2027-01-23"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "brighton-and-hove-albion",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "chelsea",
+  "away": "nottingham-forest",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "brentford",
+  "away": "manchester-united",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "aston-villa",
+  "away": "ipswich-town",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "sunderland",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "manchester-city",
+  "away": "arsenal",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "liverpool",
+  "away": "everton",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "hull-city",
+  "away": "crystal-palace",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "coventry-city",
+  "away": "leeds-united",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "fulham",
+  "week": 23,
+  "date": "2027-01-30"
+ },
+ {
+  "home": "sunderland",
+  "away": "aston-villa",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "leeds-united",
+  "away": "afc-bournemouth",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "hull-city",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "arsenal",
+  "away": "liverpool",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "brentford",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "manchester-united",
+  "away": "chelsea",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "tottenham-hotspur",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "fulham",
+  "away": "manchester-city",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "everton",
+  "away": "newcastle-united",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "coventry-city",
+  "week": 24,
+  "date": "2027-02-06"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "arsenal",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "everton",
+  "away": "leeds-united",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "brentford",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "manchester-city",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "chelsea",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "manchester-united",
+  "away": "brighton-and-hove-albion",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "hull-city",
+  "away": "sunderland",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "fulham",
+  "away": "nottingham-forest",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "coventry-city",
+  "away": "liverpool",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "aston-villa",
+  "away": "afc-bournemouth",
+  "week": 25,
+  "date": "2027-02-10"
+ },
+ {
+  "home": "sunderland",
+  "away": "everton",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "liverpool",
+  "away": "hull-city",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "chelsea",
+  "away": "ipswich-town",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "arsenal",
+  "away": "fulham",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "manchester-united",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "manchester-city",
+  "away": "newcastle-united",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "leeds-united",
+  "away": "aston-villa",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "tottenham-hotspur",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "brentford",
+  "away": "coventry-city",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "crystal-palace",
+  "week": 26,
+  "date": "2027-02-20"
+ },
+ {
+  "home": "manchester-united",
+  "away": "arsenal",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "hull-city",
+  "away": "manchester-city",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "fulham",
+  "away": "leeds-united",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "everton",
+  "away": "nottingham-forest",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "sunderland",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "liverpool",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "brentford",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "brighton-and-hove-albion",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "coventry-city",
+  "away": "afc-bournemouth",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "aston-villa",
+  "away": "chelsea",
+  "week": 27,
+  "date": "2027-02-27"
+ },
+ {
+  "home": "leeds-united",
+  "away": "hull-city",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "fulham",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "arsenal",
+  "away": "crystal-palace",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "sunderland",
+  "away": "manchester-united",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "newcastle-united",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "manchester-city",
+  "away": "everton",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "liverpool",
+  "away": "aston-villa",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "chelsea",
+  "away": "coventry-city",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "brentford",
+  "away": "ipswich-town",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "tottenham-hotspur",
+  "week": 28,
+  "date": "2027-03-03"
+ },
+ {
+  "home": "liverpool",
+  "away": "ipswich-town",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "fulham",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "coventry-city",
+  "away": "manchester-city",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "chelsea",
+  "away": "arsenal",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "nottingham-forest",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "sunderland",
+  "away": "brentford",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "manchester-united",
+  "away": "everton",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "leeds-united",
+  "away": "brighton-and-hove-albion",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "aston-villa",
+  "away": "hull-city",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "newcastle-united",
+  "week": 29,
+  "date": "2027-03-13"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "aston-villa",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "leeds-united",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "manchester-city",
+  "away": "manchester-united",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "crystal-palace",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "hull-city",
+  "away": "chelsea",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "fulham",
+  "away": "liverpool",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "everton",
+  "away": "tottenham-hotspur",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "coventry-city",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "brentford",
+  "away": "afc-bournemouth",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "arsenal",
+  "away": "sunderland",
+  "week": 30,
+  "date": "2027-03-20"
+ },
+ {
+  "home": "sunderland",
+  "away": "ipswich-town",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "leeds-united",
+  "away": "nottingham-forest",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "brentford",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "manchester-united",
+  "away": "hull-city",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "liverpool",
+  "away": "newcastle-united",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "everton",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "coventry-city",
+  "away": "arsenal",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "chelsea",
+  "away": "fulham",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "aston-villa",
+  "away": "brighton-and-hove-albion",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "manchester-city",
+  "week": 31,
+  "date": "2027-04-10"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "liverpool",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "tottenham-hotspur",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "hull-city",
+  "away": "coventry-city",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "everton",
+  "away": "afc-bournemouth",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "chelsea",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "arsenal",
+  "away": "aston-villa",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "manchester-city",
+  "away": "crystal-palace",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "manchester-united",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "fulham",
+  "away": "sunderland",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "brentford",
+  "away": "leeds-united",
+  "week": 32,
+  "date": "2027-04-17"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "hull-city",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "brentford",
+  "away": "fulham",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "aston-villa",
+  "away": "coventry-city",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "arsenal",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "sunderland",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "ipswich-town",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "manchester-united",
+  "away": "crystal-palace",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "leeds-united",
+  "away": "liverpool",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "everton",
+  "away": "brighton-and-hove-albion",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "chelsea",
+  "away": "manchester-city",
+  "week": 33,
+  "date": "2027-04-24"
+ },
+ {
+  "home": "sunderland",
+  "away": "newcastle-united",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "liverpool",
+  "away": "chelsea",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "coventry-city",
+  "away": "manchester-united",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "arsenal",
+  "away": "tottenham-hotspur",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "manchester-city",
+  "away": "brentford",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "leeds-united",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "hull-city",
+  "away": "afc-bournemouth",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "fulham",
+  "away": "everton",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "aston-villa",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "nottingham-forest",
+  "week": 34,
+  "date": "2027-05-01"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "chelsea",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "crystal-palace",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "manchester-city",
+  "away": "liverpool",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "fulham",
+  "away": "ipswich-town",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "everton",
+  "away": "hull-city",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "sunderland",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "manchester-united",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "coventry-city",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "leeds-united",
+  "away": "arsenal",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "brentford",
+  "away": "aston-villa",
+  "week": 35,
+  "date": "2027-05-08"
+ },
+ {
+  "home": "liverpool",
+  "away": "brentford",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "brighton-and-hove-albion",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "aston-villa",
+  "away": "newcastle-united",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "sunderland",
+  "away": "afc-bournemouth",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "manchester-united",
+  "away": "leeds-united",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "manchester-city",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "hull-city",
+  "away": "fulham",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "coventry-city",
+  "away": "tottenham-hotspur",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "chelsea",
+  "away": "everton",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "arsenal",
+  "away": "nottingham-forest",
+  "week": 36,
+  "date": "2027-05-15"
+ },
+ {
+  "home": "nottingham-forest",
+  "away": "ipswich-town",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "brighton-and-hove-albion",
+  "away": "liverpool",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "tottenham-hotspur",
+  "away": "manchester-united",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "newcastle-united",
+  "away": "crystal-palace",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "manchester-city",
+  "away": "aston-villa",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "leeds-united",
+  "away": "sunderland",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "fulham",
+  "away": "coventry-city",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "everton",
+  "away": "arsenal",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "brentford",
+  "away": "hull-city",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "afc-bournemouth",
+  "away": "chelsea",
+  "week": 37,
+  "date": "2027-05-23"
+ },
+ {
+  "home": "sunderland",
+  "away": "manchester-city",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "coventry-city",
+  "away": "nottingham-forest",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "arsenal",
+  "away": "brighton-and-hove-albion",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "manchester-united",
+  "away": "fulham",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "liverpool",
+  "away": "afc-bournemouth",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "ipswich-town",
+  "away": "everton",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "hull-city",
+  "away": "newcastle-united",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "crystal-palace",
+  "away": "leeds-united",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "chelsea",
+  "away": "brentford",
+  "week": 38,
+  "date": "2027-05-30"
+ },
+ {
+  "home": "aston-villa",
+  "away": "tottenham-hotspur",
+  "week": 38,
+  "date": "2027-05-30"
+ }
+]
