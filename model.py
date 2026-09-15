@@ -34,7 +34,10 @@ TRAIN_SEASON_CODES = ["2324", "2425", "2526"]  # 2023-24, 2024-25, 2025-26
 CURRENT_SEASON_CODE = "2627"                    # 2026-27 (in progress)
 BASE_URL = "https://www.football-data.co.uk/mmz4281/{code}/E0.csv"
 
-XI = 0.0065          # exponential time-decay rate (per day)
+XI = 0.002           # exponential time-decay rate (per day) -- tuned via
+                      # backtest.py against three prior seasons (2023-24,
+                      # 2024-25, 2025-26); the previous 0.0065 (a commonly
+                      # cited literature value) scored worse on all three
 MAX_GOALS = 6         # truncate scoreline grid at 6-6
 
 COLS = ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"]
@@ -224,15 +227,18 @@ class DixonColes:
 
         return -np.sum(weights * ll)
 
-    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI):
+    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI, use_xg: bool = True):
         home_idx = matches["HomeTeam"].map(self.idx).to_numpy()
         away_idx = matches["AwayTeam"].map(self.idx).to_numpy()
         hg_actual = matches["FTHG"].to_numpy()
         ag_actual = matches["FTAG"].to_numpy()
-        # Use xG as the attack/defense fitting target where we have it,
-        # falling back to the actual score for any match that lacks it.
-        hg_fit = matches["HxG"].fillna(matches["FTHG"]).to_numpy()
-        ag_fit = matches["AxG"].fillna(matches["FTAG"]).to_numpy()
+        if use_xg:
+            # Use xG as the attack/defense fitting target where we have it,
+            # falling back to the actual score for any match that lacks it.
+            hg_fit = matches["HxG"].fillna(matches["FTHG"]).to_numpy()
+            ag_fit = matches["AxG"].fillna(matches["FTAG"]).to_numpy()
+        else:
+            hg_fit, ag_fit = hg_actual, ag_actual
 
         days_ago = (as_of - matches["Date"]).dt.days.to_numpy().astype(float)
         days_ago = np.clip(days_ago, 0, None)
@@ -251,7 +257,7 @@ class DixonColes:
             args=(home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights),
             method="L-BFGS-B",
             bounds=bounds,
-            options={"maxiter": 500, "ftol": 1e-10},
+            options={"maxiter": 1000, "maxfun": 50000, "ftol": 1e-10},
         )
         if not res.success:
             raise RuntimeError(f"Optimization failed: {res.message}")
@@ -301,8 +307,10 @@ def eighteenth_place_baseline(training_data: pd.DataFrame, model: DixonColes):
     training season, to use as a baseline for teams with no recent top-flight
     data (freshly promoted clubs)."""
     atts, defs = [], []
-    for code in TRAIN_SEASON_CODES:
+    for code in training_data["SeasonCode"].unique():
         season_df = training_data[training_data["SeasonCode"] == code]
+        if len(season_df) < 300:  # skip a partial in-progress season
+            continue
         table = season_table(season_df)
         eighteenth = table.iloc[17]["Team"]  # 0-indexed: 18th place
         a, d = model.rating(eighteenth)

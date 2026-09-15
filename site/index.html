@@ -303,6 +303,55 @@
   }
   .problabels b { color: var(--text); font-weight: 500; }
 
+  .record-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto 1fr 108px;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .score-compare {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Oswald", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .score-compare .box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-width: 44px;
+  }
+  .score-compare .box .lbl {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .score-compare .box .val {
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+  .score-compare .box.actual .val { background: var(--accent-soft); color: var(--accent-strong); }
+  .score-compare .box.pred .val { background: var(--surface-2); color: var(--text-muted); }
+  .score-compare .arrow { color: var(--text-muted); font-size: 12px; }
+
+  .hitchips { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .hitchip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    border-radius: 5px;
+    padding: 2px 7px;
+    white-space: nowrap;
+  }
+  .hitchip.hit { background: color-mix(in srgb, var(--zone-top4) 18%, var(--surface-2)); color: var(--zone-top4); }
+  .hitchip.miss { background: var(--surface-2); color: var(--text-muted); }
+
   .table-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -415,6 +464,11 @@
     .match .date { order: -1; }
     .score { justify-self: center; }
     .side.away { flex-direction: row; justify-content: flex-start; text-align: left; }
+
+    .record-row { grid-template-columns: 1fr; gap: 8px; }
+    .record-row .date { order: -1; }
+    .score-compare { justify-content: center; }
+    .hitchips { flex-direction: row; align-items: center; justify-content: center; }
   }
 </style>
 
@@ -432,6 +486,7 @@
     <div class="tabs" role="tablist">
       <button type="button" id="tabFixtures" class="active" role="tab" aria-selected="true">Fixtures</button>
       <button type="button" id="tabTable" role="tab" aria-selected="false">Projected Table</button>
+      <button type="button" id="tabTrack" role="tab" aria-selected="false">Track Record</button>
     </div>
   </header>
 
@@ -468,6 +523,18 @@
     </p>
   </section>
 
+  <section id="trackView" hidden>
+    <p class="subtitle" style="max-width:66ch; padding-bottom:14px;">
+      What this model would have called <em>before</em> the season kicked off,
+      checked against what actually happened &mdash; a separate fit using only
+      2023&ndash;26 data, so it never saw these results while fitting. This is
+      not the same model behind the Fixtures tab, which already folds these
+      results back in to rate teams for upcoming matches.
+    </p>
+    <div class="model-stats" id="trackStats"></div>
+    <div id="trackList" style="margin-top:18px;"></div>
+  </section>
+
   <footer class="page">
     Model: home advantage and low-score correlation (&rho;) fitted by maximum
     likelihood; Coventry and Hull (no 2023&ndash;26 top-flight data) are rated at
@@ -480,12 +547,14 @@
 
 <script>
 (async function () {
-  const [predRes, tableRes] = await Promise.all([
+  const [predRes, tableRes, trackRes] = await Promise.all([
     fetch("predictions.json"),
     fetch("table.json"),
+    fetch("track_record.json"),
   ]);
   const rows = await predRes.json();
   const table = await tableRes.json();
+  const track = await trackRes.json();
 
   const byGw = new Map();
   for (const r of rows) {
@@ -635,27 +704,89 @@
   }
   tableBody.appendChild(tfrag);
 
+  // track record
+  const s = track.summary;
+  document.getElementById("trackStats").innerHTML = [
+    ["Matches so far", `${s.n} (GW ${s.gws_covered[0]}–${s.gws_covered[s.gws_covered.length - 1]})`],
+    ["Result accuracy", `${s.result_acc}%`],
+    ["vs. naive baseline", `${s.naive_result_acc}%`],
+    ["Log loss (lower better)", `${s.log_loss} / ${s.naive_log_loss}`],
+  ].map(([label, value]) => `<div class="stat"><span class="label">${label}</span><span class="value">${value}</span></div>`).join("");
+
+  const trackByGw = new Map();
+  for (const r of track.matches) {
+    if (!trackByGw.has(r.gw)) trackByGw.set(r.gw, []);
+    trackByGw.get(r.gw).push(r);
+  }
+  const trackGws = [...trackByGw.keys()].sort((a, b) => b - a); // most recent gameweek first
+  const trackFrag = document.createDocumentFragment();
+  for (const gw of trackGws) {
+    const matches = trackByGw.get(gw);
+    const details = document.createElement("details");
+    details.className = "gw";
+    details.open = true;
+    const dates = matches.map((m) => m.date).sort();
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span class="gwnum">Gameweek ${gw}</span><span class="gwdate">${fmtDate(dates[0])}${dates[0] !== dates[dates.length - 1] ? " – " + fmtDate(dates[dates.length - 1]) : ""}</span><span class="chev"></span>`;
+    details.appendChild(summary);
+    for (const r of matches) {
+      const row = document.createElement("div");
+      row.className = "record-row";
+      row.innerHTML = `
+        <span class="date">${fmtDate(r.date)}</span>
+        <span class="side home"><span class="code">${r.hc}</span><span class="name">${r.h}</span></span>
+        <span class="score-compare">
+          <span class="box actual"><span class="lbl">ACTUAL</span><span class="val">${r.actual}</span></span>
+          <span class="arrow">vs</span>
+          <span class="box pred"><span class="lbl">CALLED</span><span class="val">${r.pred}</span></span>
+        </span>
+        <span class="side away"><span class="code">${r.ac}</span><span class="name">${r.a}</span></span>
+        <span class="hitchips">
+          <span class="hitchip ${r.result_hit ? "hit" : "miss"}">${r.result_hit ? "✓" : "✗"} result</span>
+          <span class="hitchip ${r.exact_hit ? "hit" : "miss"}">${r.exact_hit ? "✓" : "✗"} exact</span>
+        </span>
+      `;
+      details.appendChild(row);
+    }
+    trackFrag.appendChild(details);
+  }
+  document.getElementById("trackList").appendChild(trackFrag);
+
   // tab switching
   const tabFixtures = document.getElementById("tabFixtures");
   const tabTable = document.getElementById("tabTable");
+  const tabTrack = document.getElementById("tabTrack");
   const fixturesToolbar = document.getElementById("fixturesToolbar");
   const fixturesLegend = document.getElementById("fixturesLegend");
   const tableView = document.getElementById("tableView");
+  const trackView = document.getElementById("trackView");
+  const allTabs = [tabFixtures, tabTable, tabTrack];
 
+  function activateTab(tab) {
+    for (const t of allTabs) {
+      t.classList.toggle("active", t === tab);
+      t.setAttribute("aria-selected", t === tab ? "true" : "false");
+    }
+  }
   function showFixtures() {
-    tabFixtures.classList.add("active"); tabFixtures.setAttribute("aria-selected", "true");
-    tabTable.classList.remove("active"); tabTable.setAttribute("aria-selected", "false");
+    activateTab(tabFixtures);
     fixturesToolbar.hidden = false; fixturesLegend.hidden = false; list.hidden = false;
     applySearch();
-    tableView.hidden = true;
+    tableView.hidden = true; trackView.hidden = true;
   }
   function showTable() {
-    tabTable.classList.add("active"); tabTable.setAttribute("aria-selected", "true");
-    tabFixtures.classList.remove("active"); tabFixtures.setAttribute("aria-selected", "false");
+    activateTab(tabTable);
     fixturesToolbar.hidden = true; fixturesLegend.hidden = true; list.hidden = true;
     emptyMsg.hidden = true;
-    tableView.hidden = false;
+    tableView.hidden = false; trackView.hidden = true;
   }
+  function showTrack() {
+    activateTab(tabTrack);
+    fixturesToolbar.hidden = true; fixturesLegend.hidden = true; list.hidden = true;
+    emptyMsg.hidden = true;
+    tableView.hidden = true; trackView.hidden = false;
+  }
+  tabTrack.addEventListener("click", showTrack);
   tabFixtures.addEventListener("click", showFixtures);
   tabTable.addEventListener("click", showTable);
 })();

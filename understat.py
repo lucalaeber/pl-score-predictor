@@ -38,6 +38,8 @@ TEAM_MAP = {
     "Leicester": "Leicester",
     "Liverpool": "Liverpool",
     "Luton": "Luton",
+    "Norwich": "Norwich",
+    "Watford": "Watford",
     "Manchester City": "Man City",
     "Manchester United": "Man United",
     "Newcastle United": "Newcastle",
@@ -46,6 +48,7 @@ TEAM_MAP = {
     "Southampton": "Southampton",
     "Sunderland": "Sunderland",
     "Tottenham": "Tottenham",
+    "West Bromwich Albion": "West Brom",
     "West Ham": "West Ham",
     "Wolverhampton Wanderers": "Wolves",
 }
