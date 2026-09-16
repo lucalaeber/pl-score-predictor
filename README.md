@@ -77,7 +77,13 @@ then compare against what actually happened.
 python backtest.py 2526          # train on 2223/2324/2425, test against real 2025-26
 python backtest.py 2526 3 compare        # xG-fit vs goals-fit, same target
 python backtest.py 2526 3 sweep-xi       # scan decay rates, report which scored best
+python backtest.py 2526 5 sweep-l2 0.002 # scan attack/defense shrinkage strength
 ```
+
+`track_record.py` runs the equivalent check against the *current, in-progress*
+2026-27 season: fit on only prior seasons, predict every match played so far,
+compare to what actually happened. Re-run it every gameweek or two (then
+regenerate `site/track_record.json`) to keep the "Track Record" tab current.
 
 Each run reports exact-scoreline accuracy, match-result (W/D/L) accuracy,
 log loss, and Brier score against two things: the actual outcomes, and a
@@ -103,16 +109,38 @@ real final table (rank correlation, points error, top-4/relegation hit rate).
   one-off finishing luck, which matters more for a full-season simulation
   than for single-match calibration — but this is a real trade-off, not a
   clear win, and worth re-checking if the model is changed further.
-- Re-run `sweep-xi` and `compare` against a season once it's actually
-  completed (e.g. re-validate against 2026-27 next summer) rather than
-  assuming these findings hold indefinitely — the right decay rate is a
-  property of the data window, not a universal constant.
+- L2 shrinkage of attack/defense ratings toward the league average (a
+  standard fix for overfitting) made essentially no difference (4th-decimal
+  changes in log loss) — the model wasn't actually overfitting in the way
+  that would predict, so this was dropped rather than added as a "just in
+  case" knob.
+- Training-window length matters more than expected: average log loss kept
+  improving monotonically from 2 through 5 training seasons (1.026 → 1.008 →
+  1.005 → 1.003), even with the exponential decay already in place. Bumped
+  `TRAIN_SEASON_CODES` from 3 to 5 seasons (2021-22 through 2025-26) as a
+  result — worth re-checking whether it keeps improving with 6+ once more
+  historical Understat data is worth the extra fetch time.
+- Reality check: even after tuning, match-result accuracy sits around
+  45-57% depending on the season (a "guess the most common outcome" naive
+  baseline gets ~44-45%). That's not a bug — single-match football outcomes
+  are inherently noisy, and professional bookmakers with far more data
+  (injuries, lineups, market signals) don't dramatically beat this either.
+  The season-long projection (`simulate_season.py`) is probably more
+  trustworthy than any individual match call, since per-match luck averages
+  out over 38 games.
+- Re-run `sweep-xi`, `sweep-l2`, and `compare` against a season once it's
+  actually completed (e.g. re-validate against 2026-27 next summer) rather
+  than assuming these findings hold indefinitely — the right hyperparameters
+  are a property of the data window, not universal constants.
 
 ## Interactive view
 
-`site/index.html` is a browsable page (fixtures by gameweek, searchable, plus
-the projected table) built from `site/predictions.json` and `site/table.json`.
-Regenerate those from the CSVs after re-running the model — see the export
+`site/index.html` has three tabs: Fixtures (all 380 matches by gameweek,
+searchable), Projected Table (the season simulation), and Track Record
+(pre-season predictions vs. actual results for matches played so far —
+built from `track_record.py`). It reads `site/predictions.json`,
+`site/table.json`, and `site/track_record.json`; regenerate those from the
+CSVs after re-running the model or track_record.py — see the export
 snippet in the commit that added the projected-table view, or ask for it
 again if needed.
 

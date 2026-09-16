@@ -38,7 +38,7 @@ def season_codes_before(target_code: str, n: int) -> list:
     return [f"{start_year - i:02d}{(start_year - i + 1) % 100:02d}" for i in range(n, 0, -1)]
 
 
-def fit_backtest_model(train_codes, use_xg=True, xi=XI):
+def fit_backtest_model(train_codes, use_xg=True, xi=XI, l2=0.0):
     frames = []
     for code in train_codes:
         df = load_season(code)
@@ -51,7 +51,7 @@ def fit_backtest_model(train_codes, use_xg=True, xi=XI):
 
     model = DixonColes(sorted(historical_teams))
     as_of = training_data["Date"].max() + pd.Timedelta(days=1)
-    model.fit(training_data, as_of=as_of, xi=xi, use_xg=use_xg)
+    model.fit(training_data, as_of=as_of, xi=xi, use_xg=use_xg, l2=l2)
     return model, training_data, historical_teams
 
 
@@ -170,13 +170,13 @@ def report_table_metrics(model, test_df, target_code):
     print(f"\nWrote {out_path}")
 
 
-def run_backtest(target_code, n_train, use_xg=True, xi=XI, verbose=True):
+def run_backtest(target_code, n_train, use_xg=True, xi=XI, l2=0.0, verbose=True):
     train_codes = season_codes_before(target_code, n_train)
     if verbose:
-        print(f"Training on seasons: {train_codes}  (use_xg={use_xg}, xi={xi})")
+        print(f"Training on seasons: {train_codes}  (use_xg={use_xg}, xi={xi}, l2={l2})")
         print(f"Testing on season:   {target_code}  (real, completed -- ground truth known)\n")
 
-    model, training_data, historical_teams = fit_backtest_model(train_codes, use_xg=use_xg, xi=xi)
+    model, training_data, historical_teams = fit_backtest_model(train_codes, use_xg=use_xg, xi=xi, l2=l2)
     if verbose:
         print(f"home_adv={model.params_['home_adv']:.3f}  rho={model.params_['rho']:.3f}")
 
@@ -240,6 +240,22 @@ def sweep_xi(target_code, n_train, use_xg=True):
     print(f"\nLowest log loss at xi={best[0]} ({best[1]:.4f})")
 
 
+def sweep_l2(target_code, n_train, use_xg=True, xi=XI):
+    l2_values = [0.0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4]
+    print(f"Sweeping l2 (attack/defense shrinkage) on season {target_code}, use_xg={use_xg}, xi={xi}\n")
+    print(f"{'l2':>8}{'home_adv':>10}{'rho':>8}{'ResultAcc':>12}{'LogLoss':>10}{'Brier':>9}")
+    print("-" * 57)
+    best = None
+    for l2 in l2_values:
+        model, results, training_data, _ = run_backtest(target_code, n_train, use_xg=use_xg, xi=xi, l2=l2, verbose=False)
+        m = compute_match_metrics(results, training_data)
+        print(f"{l2:>8.3f}{model.params_['home_adv']:>10.3f}{model.params_['rho']:>8.3f}"
+              f"{m['result_acc']:>11.1%} {m['log_loss']:>9.4f}{m['brier']:>9.4f}")
+        if best is None or m["log_loss"] < best[1]:
+            best = (l2, m["log_loss"])
+    print(f"\nLowest log loss at l2={best[0]} ({best[1]:.4f})")
+
+
 def main():
     target_code = sys.argv[1] if len(sys.argv) > 1 else "2526"
     n_train = int(sys.argv[2]) if len(sys.argv) > 2 else 3
@@ -251,6 +267,10 @@ def main():
         return
     if mode == "sweep-xi":
         sweep_xi(target_code, n_train)
+        return
+    if mode == "sweep-l2":
+        xi = float(sys.argv[4]) if len(sys.argv) > 4 else XI
+        sweep_l2(target_code, n_train, xi=xi)
         return
 
     model, results, training_data, test_df = run_backtest(target_code, n_train, use_xg=True)

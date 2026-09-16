@@ -2,7 +2,7 @@
 Static Premier League Score Predictor
 ======================================
 Dixon-Coles maximum-likelihood attack/defense model fit on the last three
-completed Premier League seasons (2023-24, 2024-25, 2025-26), used to predict
+completed Premier League seasons (see TRAIN_SEASON_CODES below), used to predict
 the most probable scoreline and outcome probabilities for all 380 fixtures
 of the 2026-27 season.
 
@@ -30,7 +30,11 @@ from understat import fetch_understat_season
 # Config
 # ---------------------------------------------------------------------------
 
-TRAIN_SEASON_CODES = ["2324", "2425", "2526"]  # 2023-24, 2024-25, 2025-26
+TRAIN_SEASON_CODES = ["2122", "2223", "2324", "2425", "2526"]  # 2021-22 .. 2025-26
+# ^ 5 seasons, not 3 -- backtest.py showed average log loss keeps improving
+# as the training window grows (even with the exponential decay already
+# down-weighting older seasons), monotonically through every window size
+# tested (2 through 5 seasons).
 CURRENT_SEASON_CODE = "2627"                    # 2026-27 (in progress)
 BASE_URL = "https://www.football-data.co.uk/mmz4281/{code}/E0.csv"
 
@@ -98,7 +102,7 @@ def load_training_data() -> pd.DataFrame:
     # -- football-data.co.uk already publishes HxG/AxG for it directly, and
     # the exponential time decay in DixonColes.fit will naturally weight
     # these most heavily since they're the most recent matches available.
-    # Matches involving a team with no 2023-26 history (a fresh promotion)
+    # Matches involving a team with no prior top-flight history (a fresh promotion)
     # are excluded here: 3-4 games isn't enough to fit that team's own
     # rating reliably, so it keeps the 18th-place historical baseline
     # instead (see eighteenth_place_baseline / build_model_and_fixtures).
@@ -199,7 +203,7 @@ class DixonColes:
         deff = np.append(def_free, -def_free.sum())
         return att, deff, home_adv, rho
 
-    def _neg_log_likelihood(self, x, home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights):
+    def _neg_log_likelihood(self, x, home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2):
         att, deff, home_adv, rho = self._unpack(x)
 
         log_lam = home_adv + att[home_idx] + deff[away_idx]
@@ -225,9 +229,18 @@ class DixonColes:
         tau = np.clip(tau, 1e-10, None)  # guard against invalid rho region
         ll = ll + np.log(tau)
 
-        return -np.sum(weights * ll)
+        nll = -np.sum(weights * ll)
 
-    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI, use_xg: bool = True):
+        # L2 shrinkage of attack/defense toward the league-average team (0).
+        # With a decayed effective sample size, plain MLE can chase noise
+        # for teams with fewer heavily-weighted matches; this pulls extreme
+        # ratings back in, trading a little bias for less variance.
+        if l2 > 0:
+            nll += l2 * (np.sum(att ** 2) + np.sum(deff ** 2))
+
+        return nll
+
+    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI, use_xg: bool = True, l2: float = 0.0):
         home_idx = matches["HomeTeam"].map(self.idx).to_numpy()
         away_idx = matches["AwayTeam"].map(self.idx).to_numpy()
         hg_actual = matches["FTHG"].to_numpy()
@@ -254,7 +267,7 @@ class DixonColes:
         res = minimize(
             self._neg_log_likelihood,
             x0,
-            args=(home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights),
+            args=(home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2),
             method="L-BFGS-B",
             bounds=bounds,
             options={"maxiter": 1000, "maxfun": 50000, "ftol": 1e-10},

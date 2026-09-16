@@ -3,8 +3,8 @@ Track record: how would the model's predictions have looked *before* the
 2026-27 season started, checked against what's actually happened so far?
 
 This reuses backtest.py's machinery but points it at the in-progress
-2026-27 season. Crucially, it fits on ONLY the three prior completed
-seasons (2023-24, 2024-25, 2025-26) -- unlike predictions_2026_2027.csv's
+2026-27 season. Crucially, it fits on ONLY the prior completed seasons
+(see model.py's TRAIN_SEASON_CODES) -- unlike predictions_2026_2027.csv's
 model, which folds already-played 2026-27 matches into training for
 rating purposes and so would be "cheating" if used to grade those same
 matches (it already saw the results). This gives an honest, un-leaked
@@ -28,7 +28,7 @@ from model import load_real_fixtures
 from backtest import run_backtest, compute_match_metrics
 
 TARGET_CODE = "2627"
-N_TRAIN = 3
+N_TRAIN = 5  # keep in sync with model.py's TRAIN_SEASON_CODES length
 
 CODES = {
     "Arsenal": "ARS", "Aston Villa": "AVL", "Bournemouth": "BOU", "Brentford": "BRE",
@@ -40,7 +40,7 @@ CODES = {
 
 
 def main():
-    print(f"Fitting a pre-season-only model (trained on the 3 seasons before {TARGET_CODE},")
+    print(f"Fitting a pre-season-only model (trained on the {N_TRAIN} seasons before {TARGET_CODE},")
     print("no 2026-27 results included) and checking it against matches played so far...\n")
 
     _, results, training_data, _ = run_backtest(TARGET_CODE, N_TRAIN, use_xg=True)
