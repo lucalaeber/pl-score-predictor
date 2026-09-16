@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from model import load_real_fixtures
-from backtest import run_backtest, compute_match_metrics
+from backtest import run_ensemble_backtest, compute_match_metrics
 
 TARGET_CODE = "2627"
 N_TRAIN = 5  # keep in sync with model.py's TRAIN_SEASON_CODES length
@@ -40,10 +40,11 @@ CODES = {
 
 
 def main():
-    print(f"Fitting a pre-season-only model (trained on the {N_TRAIN} seasons before {TARGET_CODE},")
-    print("no 2026-27 results included) and checking it against matches played so far...\n")
+    print(f"Fitting a pre-season-only ensemble (xG-fit + goals-fit, trained on the {N_TRAIN}")
+    print(f"seasons before {TARGET_CODE}, no 2026-27 results included) and checking it")
+    print("against matches played so far...\n")
 
-    _, results, training_data, _ = run_backtest(TARGET_CODE, N_TRAIN, use_xg=True)
+    results, training_data = run_ensemble_backtest(TARGET_CODE, N_TRAIN)
     print(f"\n{len(results)} matches played so far in 2026-27\n")
 
     m = compute_match_metrics(results, training_data)

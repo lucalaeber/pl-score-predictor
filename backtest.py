@@ -89,6 +89,70 @@ def predict_matches(model, test_df):
     return pd.DataFrame(rows)
 
 
+def predict_matches_ensemble(model_a, model_b, test_df):
+    """Same as predict_matches, but blends two fitted models' full score
+    matrices (elementwise average, renormalized) before reading off the
+    predicted score and outcome probabilities -- a free way to combine two
+    models that make different kinds of mistakes."""
+    rows = []
+    for _, r in test_df.iterrows():
+        home, away = r["HomeTeam"], r["AwayTeam"]
+        matrix_a, lam_a, mu_a = model_a.score_matrix(home, away)
+        matrix_b, lam_b, mu_b = model_b.score_matrix(home, away)
+        matrix = (matrix_a + matrix_b) / 2
+        matrix = matrix / matrix.sum()
+
+        flat_idx = np.unravel_index(np.argmax(matrix), matrix.shape)
+        pred_score = f"{flat_idx[0]}-{flat_idx[1]}"
+
+        p_home = np.tril(matrix, -1).sum()
+        p_draw = np.trace(matrix)
+        p_away = np.triu(matrix, 1).sum()
+
+        actual_h, actual_a = int(r["FTHG"]), int(r["FTAG"])
+        actual_result = "H" if actual_h > actual_a else ("A" if actual_h < actual_a else "D")
+        pred_result = max([("H", p_home), ("D", p_draw), ("A", p_away)], key=lambda t: t[1])[0]
+
+        rows.append({
+            "Date": r["Date"].date().isoformat(),
+            "HomeTeam": home,
+            "AwayTeam": away,
+            "ActualScore": f"{actual_h}-{actual_a}",
+            "PredictedScore": pred_score,
+            "ActualResult": actual_result,
+            "PredictedResult": pred_result,
+            "P_Home": round(float(p_home), 4),
+            "P_Draw": round(float(p_draw), 4),
+            "P_Away": round(float(p_away), 4),
+            "ExpectedHomeGoals": round(float((lam_a + lam_b) / 2), 3),
+            "ExpectedAwayGoals": round(float((mu_a + mu_b) / 2), 3),
+        })
+    return pd.DataFrame(rows)
+
+
+def run_ensemble_backtest(target_code, n_train, xi=XI, verbose=True):
+    train_codes = season_codes_before(target_code, n_train)
+    model_g, training_data, historical_teams = fit_backtest_model(train_codes, use_xg=False, xi=xi)
+    model_x, _, _ = fit_backtest_model(train_codes, use_xg=True, xi=xi)
+
+    test_df = load_season(target_code)
+    test_teams = sorted(set(test_df["HomeTeam"]) | set(test_df["AwayTeam"]))
+    new_teams = sorted(set(test_teams) - historical_teams)
+    if new_teams:
+        base_att_g, base_def_g = eighteenth_place_baseline(training_data, model_g)
+        base_att_x, base_def_x = eighteenth_place_baseline(training_data, model_x)
+        for t in new_teams:
+            model_g.params_["att"][t] = base_att_g
+            model_g.params_["def"][t] = base_def_g
+            model_g.teams.append(t)
+            model_x.params_["att"][t] = base_att_x
+            model_x.params_["def"][t] = base_def_x
+            model_x.teams.append(t)
+
+    results = predict_matches_ensemble(model_g, model_x, test_df)
+    return results, training_data
+
+
 def compute_match_metrics(results: pd.DataFrame, training_data: pd.DataFrame) -> dict:
     n = len(results)
     exact_acc = (results["PredictedScore"] == results["ActualScore"]).mean()
@@ -271,6 +335,17 @@ def main():
     if mode == "sweep-l2":
         xi = float(sys.argv[4]) if len(sys.argv) > 4 else XI
         sweep_l2(target_code, n_train, xi=xi)
+        return
+    if mode == "ensemble":
+        results, training_data = run_ensemble_backtest(target_code, n_train)
+        m = compute_match_metrics(results, training_data)
+        print(f"Ensemble (goals-fit + xG-fit averaged) on season {target_code}, {n_train}-season window\n")
+        print(f"{'Metric':<28}{'Ensemble':>10}{'Naive baseline':>18}")
+        print("-" * 56)
+        print(f"{'Exact scoreline accuracy':<28}{m['exact_acc']:>9.1%} {m['naive_exact_acc']:>17.1%}")
+        print(f"{'Match result accuracy':<28}{m['result_acc']:>9.1%} {m['naive_result_acc']:>17.1%}")
+        print(f"{'Log loss (lower better)':<28}{m['log_loss']:>10.4f}{m['naive_log_loss']:>19.4f}")
+        print(f"{'Brier score (lower better)':<28}{m['brier']:>10.4f}{m['naive_brier']:>19.4f}")
         return
 
     model, results, training_data, test_df = run_backtest(target_code, n_train, use_xg=True)

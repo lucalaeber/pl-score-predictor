@@ -311,6 +311,27 @@ class DixonColes:
         return matrix, lam, mu
 
 
+class EnsembleModel:
+    """Averages two fitted DixonColes models' score matrices (elementwise,
+    renormalized). Backtesting (backtest.py's `ensemble` mode) showed the
+    xG-fit and goals-fit models make different kinds of mistakes -- xG edges
+    out on hard accuracy, goals-fit is slightly better calibrated -- and
+    averaging them beat either alone on log loss/Brier in every backtested
+    season. Exposes the same score_matrix(home, away) interface as
+    DixonColes so it's a drop-in replacement everywhere a model is used."""
+
+    def __init__(self, model_a: DixonColes, model_b: DixonColes):
+        self.model_a = model_a
+        self.model_b = model_b
+
+    def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS):
+        matrix_a, lam_a, mu_a = self.model_a.score_matrix(home_team, away_team, max_goals)
+        matrix_b, lam_b, mu_b = self.model_b.score_matrix(home_team, away_team, max_goals)
+        matrix = (matrix_a + matrix_b) / 2
+        matrix /= matrix.sum()
+        return matrix, (lam_a + lam_b) / 2, (mu_a + mu_b) / 2
+
+
 # ---------------------------------------------------------------------------
 # 4. Promoted-team baseline ratings (18th-place historical average)
 # ---------------------------------------------------------------------------
@@ -415,19 +436,27 @@ def build_model_and_fixtures(verbose: bool = True):
     if new_teams:
         log(f"  Teams with no recent PL history (baseline rating applied): {new_teams}")
 
-    log("Fitting Dixon-Coles model (MLE, exponential time decay)...")
-    model = DixonColes(trained_teams)
+    log("Fitting Dixon-Coles models (xG-fit and goals-fit, MLE with time decay)...")
     as_of = training_data["Date"].max() + pd.Timedelta(days=1)
-    model.fit(training_data, as_of=as_of, xi=XI)
-    log(f"  home_adv={model.params_['home_adv']:.3f}  rho={model.params_['rho']:.3f}")
+
+    model_xg = DixonColes(trained_teams)
+    model_xg.fit(training_data, as_of=as_of, xi=XI, use_xg=True)
+    log(f"  xG-fit:    home_adv={model_xg.params_['home_adv']:.3f}  rho={model_xg.params_['rho']:.3f}")
+
+    model_goals = DixonColes(trained_teams)
+    model_goals.fit(training_data, as_of=as_of, xi=XI, use_xg=False)
+    log(f"  goals-fit: home_adv={model_goals.params_['home_adv']:.3f}  rho={model_goals.params_['rho']:.3f}")
 
     if new_teams:
-        base_att, base_def = eighteenth_place_baseline(training_data, model)
-        log(f"  18th-place baseline rating: att={base_att:.3f}, def={base_def:.3f}")
-        for t in new_teams:
-            model.params_["att"][t] = base_att
-            model.params_["def"][t] = base_def
-            model.teams.append(t)
+        for m in (model_xg, model_goals):
+            base_att, base_def = eighteenth_place_baseline(training_data, m)
+            for t in new_teams:
+                m.params_["att"][t] = base_att
+                m.params_["def"][t] = base_def
+                m.teams.append(t)
+        log(f"  18th-place baseline applied for: {new_teams}")
+
+    model = EnsembleModel(model_xg, model_goals)
 
     log("Loading real 2026-27 fixture list (380 matches)...")
     fixtures = load_real_fixtures()

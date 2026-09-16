@@ -25,17 +25,22 @@ for the real 2026-27 season (all 380 fixtures).
    against actual scorelines, since the effect it corrects for (0-0/1-0/0-1/
    1-1 being more or less common than independent Poisson predicts) is a
    real discrete-score phenomenon that xG wouldn't show.
-4. **Promoted-team baseline** — teams with no recent top-flight history are
+4. **Ensemble** (`EnsembleModel` in `model.py`) — fits the model twice (once
+   on xG, once on actual goals) and averages their score-matrix predictions.
+   Backtesting showed the two make different kinds of mistakes and combining
+   them beats either alone on log loss/Brier in every season tested — see
+   the backtesting section below.
+5. **Promoted-team baseline** — teams with no recent top-flight history are
    assigned the average rating of the team that finished 18th in each of the
-   three training seasons (their own 2026-27 matches so far are too few to
-   fit a reliable rating directly, so they aren't used for this).
-5. **Fixture list** — the real official 2026-27 schedule
+   training seasons (their own 2026-27 matches so far are too few to fit a
+   reliable rating directly, so they aren't used for this).
+6. **Fixture list** — the real official 2026-27 schedule
    (`fixtures_2026_27_raw.json`), not a simulated round-robin. Cross-checked
    against actual recorded 2026-27 results for gameweeks 1-2 (exact match).
-6. **Match predictions** (`model.py`) — for each fixture, a Poisson scoreline
+7. **Match predictions** (`model.py`) — for each fixture, a Poisson scoreline
    grid (with the Dixon-Coles low-score adjustment), the most likely exact
    score, and Win/Draw/Loss probabilities.
-7. **Season projection** (`simulate_season.py`) — Monte Carlo simulation of
+8. **Season projection** (`simulate_season.py`) — Monte Carlo simulation of
    the whole season (20,000 runs by default), sampling one scoreline per
    fixture per run from that fixture's own probability grid, aggregated into
    expected points, expected final position, and title/top-4/relegation
@@ -74,10 +79,11 @@ match of that target season using only information available beforehand,
 then compare against what actually happened.
 
 ```bash
-python backtest.py 2526          # train on 2223/2324/2425, test against real 2025-26
-python backtest.py 2526 3 compare        # xG-fit vs goals-fit, same target
-python backtest.py 2526 3 sweep-xi       # scan decay rates, report which scored best
-python backtest.py 2526 5 sweep-l2 0.002 # scan attack/defense shrinkage strength
+python backtest.py 2526              # train on 5 prior seasons, test against real 2025-26
+python backtest.py 2526 5 compare    # xG-fit vs goals-fit individually, same target
+python backtest.py 2526 5 ensemble   # the two combined -- what production actually uses
+python backtest.py 2526 3 sweep-xi   # scan decay rates, report which scored best
+python backtest.py 2526 5 sweep-l2 0.002  # scan attack/defense shrinkage strength
 ```
 
 `track_record.py` runs the equivalent check against the *current, in-progress*
@@ -102,13 +108,14 @@ real final table (rank correlation, points error, top-4/relegation hit rate).
   near zero. ξ = 0.002 scored better on log loss in all three backtested
   seasons (about 2-3% lower on average) and gives home-advantage/rho values
   in the range the Dixon-Coles literature typically reports.
-- Fitting on xG vs. actual goals is close to a wash empirically: xG edged
+- Fitting on xG vs. actual goals individually is close to a wash: xG edged
   out actual-goals on exact-score and result accuracy in 2 of 3 seasons,
   while actual-goals was marginally better calibrated (log loss/Brier) in
-  all 3. xG was kept as the default anyway since it's less exposed to
-  one-off finishing luck, which matters more for a full-season simulation
-  than for single-match calibration — but this is a real trade-off, not a
-  clear win, and worth re-checking if the model is changed further.
+  all 3 — each makes different mistakes. Averaging the two models' score
+  matrices (`EnsembleModel`, `backtest.py`'s `ensemble` mode) beat *both*
+  individual models on log loss/Brier in every backtested season (average
+  log loss 1.003 → 0.999 versus the xG-only model), so production now fits
+  and combines both rather than picking one.
 - L2 shrinkage of attack/defense ratings toward the league average (a
   standard fix for overfitting) made essentially no difference (4th-decimal
   changes in log loss) — the model wasn't actually overfitting in the way
@@ -128,10 +135,11 @@ real final table (rank correlation, points error, top-4/relegation hit rate).
   The season-long projection (`simulate_season.py`) is probably more
   trustworthy than any individual match call, since per-match luck averages
   out over 38 games.
-- Re-run `sweep-xi`, `sweep-l2`, and `compare` against a season once it's
-  actually completed (e.g. re-validate against 2026-27 next summer) rather
-  than assuming these findings hold indefinitely — the right hyperparameters
-  are a property of the data window, not universal constants.
+- Re-run `sweep-xi`, `sweep-l2`, `compare`, and `ensemble` against a season
+  once it's actually completed (e.g. re-validate against 2026-27 next
+  summer) rather than assuming these findings hold indefinitely — the right
+  hyperparameters are a property of the data window, not universal
+  constants.
 
 ## Interactive view
 
@@ -149,10 +157,16 @@ again if needed.
 - Data sources: football-data.co.uk (results, current-season team list) and
   Understat.com (xG, via its same-origin JSON endpoint — see `understat.py`
   for details; no login or paid access involved).
-- To improve accuracy further: re-run the pipeline periodically during the
-  season so ratings reflect current form rather than only the training
-  window; consider a proper Bayesian shrinkage of promoted-team ratings
-  toward the baseline as their own 2026-27 sample size grows, instead of the
-  current all-or-nothing switch; re-tune ξ (and re-check the xG-vs-goals
-  choice) with `backtest.py` periodically rather than treating either as
-  fixed.
+- To improve accuracy further, free options not yet tried: team-specific
+  home-advantage instead of one league-wide value; a short-term "current
+  form" component (e.g. an Elo-style adjustment from the last 5-6 games)
+  blended with the long-run rating, which might capture momentum/injuries
+  the smooth exponential decay misses; incorporating shots/corners data
+  (already in the football-data.co.uk CSVs) as an auxiliary signal. Beyond
+  free options, bookmaker odds are the single strongest predictor of match
+  outcomes in the literature, but they're only available close to kickoff
+  for future fixtures (a free-tier odds API could work for a live, closer-
+  to-matchday version of this, unlike the current one-shot pipeline).
+  Whatever's tried, validate it with `backtest.py` before trusting it —
+  several plausible-sounding ideas here (L2 shrinkage) tested out as no
+  better than what was already there.
