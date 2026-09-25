@@ -84,6 +84,7 @@ python backtest.py 2526 5 compare    # xG-fit vs goals-fit individually, same ta
 python backtest.py 2526 5 ensemble   # the two combined -- what production actually uses
 python backtest.py 2526 3 sweep-xi   # scan decay rates, report which scored best
 python backtest.py 2526 5 sweep-l2 0.002  # scan attack/defense shrinkage strength
+python backtest.py 2526 5 home-adv   # global vs. per-team home advantage
 ```
 
 `track_record.py` runs the equivalent check against the *current, in-progress*
@@ -157,16 +158,23 @@ again if needed.
 - Data sources: football-data.co.uk (results, current-season team list) and
   Understat.com (xG, via its same-origin JSON endpoint — see `understat.py`
   for details; no login or paid access involved).
-- To improve accuracy further, free options not yet tried: team-specific
-  home-advantage instead of one league-wide value; a short-term "current
-  form" component (e.g. an Elo-style adjustment from the last 5-6 games)
-  blended with the long-run rating, which might capture momentum/injuries
-  the smooth exponential decay misses; incorporating shots/corners data
-  (already in the football-data.co.uk CSVs) as an auxiliary signal. Beyond
-  free options, bookmaker odds are the single strongest predictor of match
-  outcomes in the literature, but they're only available close to kickoff
-  for future fixtures (a free-tier odds API could work for a live, closer-
-  to-matchday version of this, unlike the current one-shot pipeline).
-  Whatever's tried, validate it with `backtest.py` before trusting it —
-  several plausible-sounding ideas here (L2 shrinkage) tested out as no
-  better than what was already there.
+- Per-team home advantage (`DixonColes(teams, team_home_adv=True)`,
+  `backtest.py`'s `home-adv` mode) was tried and tested inconclusive: it won
+  clearly in one backtested season, lost in another, and was a wash in the
+  third — average log loss across all three barely moved (1.0029 → 1.0025).
+  Not worth ~19 extra parameters for that, so it's left as an opt-in feature
+  rather than the default.
+- Free options not yet tried: a short-term "current form" component (e.g.
+  an Elo-style adjustment from the last 5-6 games) blended with the long-run
+  rating, which might capture momentum/injuries the smooth exponential
+  decay misses; incorporating shots/corners data (already in the
+  football-data.co.uk CSVs) as an auxiliary signal. Beyond free options,
+  bookmaker odds are the single strongest predictor of match outcomes in
+  the literature, but they're only available close to kickoff for future
+  fixtures (a free-tier odds API could work for a live, closer-to-matchday
+  version of this, unlike the current one-shot pipeline).
+- Whatever's tried, validate it with `backtest.py` before trusting it —
+  several plausible-sounding ideas here (L2 shrinkage, per-team home
+  advantage) tested out as no better than what was already there. That's a
+  useful result too, not a wasted experiment: it stops the same idea from
+  being re-tried later on a hunch.

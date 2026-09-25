@@ -38,7 +38,7 @@ def season_codes_before(target_code: str, n: int) -> list:
     return [f"{start_year - i:02d}{(start_year - i + 1) % 100:02d}" for i in range(n, 0, -1)]
 
 
-def fit_backtest_model(train_codes, use_xg=True, xi=XI, l2=0.0):
+def fit_backtest_model(train_codes, use_xg=True, xi=XI, l2=0.0, team_home_adv=False):
     frames = []
     for code in train_codes:
         df = load_season(code)
@@ -49,7 +49,7 @@ def fit_backtest_model(train_codes, use_xg=True, xi=XI, l2=0.0):
         historical_teams |= set(f["HomeTeam"]) | set(f["AwayTeam"])
     training_data = pd.concat(frames, ignore_index=True).sort_values("Date").reset_index(drop=True)
 
-    model = DixonColes(sorted(historical_teams))
+    model = DixonColes(sorted(historical_teams), team_home_adv=team_home_adv)
     as_of = training_data["Date"].max() + pd.Timedelta(days=1)
     model.fit(training_data, as_of=as_of, xi=xi, use_xg=use_xg, l2=l2)
     return model, training_data, historical_teams
@@ -139,8 +139,8 @@ def run_ensemble_backtest(target_code, n_train, xi=XI, verbose=True):
     test_teams = sorted(set(test_df["HomeTeam"]) | set(test_df["AwayTeam"]))
     new_teams = sorted(set(test_teams) - historical_teams)
     if new_teams:
-        base_att_g, base_def_g = eighteenth_place_baseline(training_data, model_g)
-        base_att_x, base_def_x = eighteenth_place_baseline(training_data, model_x)
+        base_att_g, base_def_g = eighteenth_place_baseline(training_data, model_g, new_teams)
+        base_att_x, base_def_x = eighteenth_place_baseline(training_data, model_x, new_teams)
         for t in new_teams:
             model_g.params_["att"][t] = base_att_g
             model_g.params_["def"][t] = base_def_g
@@ -234,14 +234,16 @@ def report_table_metrics(model, test_df, target_code):
     print(f"\nWrote {out_path}")
 
 
-def run_backtest(target_code, n_train, use_xg=True, xi=XI, l2=0.0, verbose=True):
+def run_backtest(target_code, n_train, use_xg=True, xi=XI, l2=0.0, team_home_adv=False, verbose=True):
     train_codes = season_codes_before(target_code, n_train)
     if verbose:
-        print(f"Training on seasons: {train_codes}  (use_xg={use_xg}, xi={xi}, l2={l2})")
+        print(f"Training on seasons: {train_codes}  (use_xg={use_xg}, xi={xi}, l2={l2}, team_home_adv={team_home_adv})")
         print(f"Testing on season:   {target_code}  (real, completed -- ground truth known)\n")
 
-    model, training_data, historical_teams = fit_backtest_model(train_codes, use_xg=use_xg, xi=xi, l2=l2)
-    if verbose:
+    model, training_data, historical_teams = fit_backtest_model(
+        train_codes, use_xg=use_xg, xi=xi, l2=l2, team_home_adv=team_home_adv
+    )
+    if verbose and not team_home_adv:
         print(f"home_adv={model.params_['home_adv']:.3f}  rho={model.params_['rho']:.3f}")
 
     test_df = load_season(target_code)
@@ -250,7 +252,7 @@ def run_backtest(target_code, n_train, use_xg=True, xi=XI, l2=0.0, verbose=True)
     if new_teams:
         if verbose:
             print(f"Teams with no prior history (baseline applied): {new_teams}")
-        base_att, base_def = eighteenth_place_baseline(training_data, model)
+        base_att, base_def = eighteenth_place_baseline(training_data, model, new_teams)
         for t in new_teams:
             model.params_["att"][t] = base_att
             model.params_["def"][t] = base_def
@@ -320,6 +322,30 @@ def sweep_l2(target_code, n_train, use_xg=True, xi=XI):
     print(f"\nLowest log loss at l2={best[0]} ({best[1]:.4f})")
 
 
+def compare_home_adv(target_code, n_train, use_xg=True, xi=XI):
+    print(f"Global vs. per-team home advantage on season {target_code}, use_xg={use_xg}, xi={xi}\n")
+    _, results_global, training_data, _ = run_backtest(target_code, n_train, use_xg=use_xg, xi=xi, team_home_adv=False, verbose=False)
+    m_global = compute_match_metrics(results_global, training_data)
+
+    _, results_team, training_data2, _ = run_backtest(target_code, n_train, use_xg=use_xg, xi=xi, team_home_adv=True, verbose=False)
+    m_team = compute_match_metrics(results_team, training_data2)
+
+    print(f"{'Metric':<28}{'Global':>10}{'Per-team':>12}{'Better':>10}")
+    print("-" * 60)
+    rows = [
+        ("Exact scoreline accuracy", m_global["exact_acc"], m_team["exact_acc"], "higher"),
+        ("Match result accuracy", m_global["result_acc"], m_team["result_acc"], "higher"),
+        ("Log loss", m_global["log_loss"], m_team["log_loss"], "lower"),
+        ("Brier score", m_global["brier"], m_team["brier"], "lower"),
+    ]
+    for label, g, t, direction in rows:
+        better = "Per-team" if (t > g) == (direction == "higher") else "Global"
+        if t == g:
+            better = "tie"
+        fmt = "{:>9.1%}" if "accuracy" in label else "{:>9.4f} "
+        print(f"{label:<28}{fmt.format(g):>10}{fmt.format(t):>12}{better:>10}")
+
+
 def main():
     target_code = sys.argv[1] if len(sys.argv) > 1 else "2526"
     n_train = int(sys.argv[2]) if len(sys.argv) > 2 else 3
@@ -335,6 +361,9 @@ def main():
     if mode == "sweep-l2":
         xi = float(sys.argv[4]) if len(sys.argv) > 4 else XI
         sweep_l2(target_code, n_train, xi=xi)
+        return
+    if mode == "home-adv":
+        compare_home_adv(target_code, n_train)
         return
     if mode == "ensemble":
         results, training_data = run_ensemble_backtest(target_code, n_train)

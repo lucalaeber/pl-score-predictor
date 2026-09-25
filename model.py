@@ -174,11 +174,12 @@ def season_table(season_df: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 class DixonColes:
-    def __init__(self, teams):
+    def __init__(self, teams, team_home_adv: bool = False):
         self.teams = list(teams)
         self.n = len(self.teams)
         self.idx = {t: i for i, t in enumerate(self.teams)}
         self.params_ = None  # dict: att, def, home_adv, rho
+        self.team_home_adv = team_home_adv  # per-team home advantage instead of one league-wide value
 
     @staticmethod
     def _tau(x, y, lam, mu, rho):
@@ -196,17 +197,26 @@ class DixonColes:
         n = self.n
         att_free = x[0:n - 1]
         def_free = x[n - 1:2 * (n - 1)]
-        home_adv = x[2 * (n - 1)]
-        rho = x[2 * (n - 1) + 1]
-        # last team's att/def fixed so that sum(att) = 0, sum(def) = 0
         att = np.append(att_free, -att_free.sum())
         deff = np.append(def_free, -def_free.sum())
+        # last team's att/def fixed so that sum(att) = 0, sum(def) = 0
+
+        if self.team_home_adv:
+            home_base = x[2 * (n - 1)]
+            offset_free = x[2 * (n - 1) + 1:3 * (n - 1) + 1]
+            offset = np.append(offset_free, -offset_free.sum())
+            home_adv = home_base + offset  # per-team, averaging to home_base
+            rho = x[3 * (n - 1) + 1]
+        else:
+            home_adv = x[2 * (n - 1)]  # single league-wide value
+            rho = x[2 * (n - 1) + 1]
         return att, deff, home_adv, rho
 
     def _neg_log_likelihood(self, x, home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2):
         att, deff, home_adv, rho = self._unpack(x)
 
-        log_lam = home_adv + att[home_idx] + deff[away_idx]
+        home_adv_term = home_adv[home_idx] if self.team_home_adv else home_adv
+        log_lam = home_adv_term + att[home_idx] + deff[away_idx]
         log_mu = att[away_idx] + deff[home_idx]
         lam = np.exp(log_lam)
         mu = np.exp(log_mu)
@@ -258,11 +268,19 @@ class DixonColes:
         weights = np.exp(-xi * days_ago)
 
         n = self.n
-        x0 = np.zeros(2 * (n - 1) + 2)
-        x0[2 * (n - 1)] = 0.25   # home_adv start
-        x0[2 * (n - 1) + 1] = 0.0  # rho start
+        if self.team_home_adv:
+            n_params = 3 * (n - 1) + 2
+        else:
+            n_params = 2 * (n - 1) + 2
+        x0 = np.zeros(n_params)
+        x0[2 * (n - 1)] = 0.25   # home_adv (base, if per-team) start
+        rho_idx = n_params - 1
+        x0[rho_idx] = 0.0  # rho start
 
-        bounds = [(-3, 3)] * (2 * (n - 1)) + [(-2, 2), (-0.4, 0.4)]
+        if self.team_home_adv:
+            bounds = [(-3, 3)] * (2 * (n - 1)) + [(-2, 2)] + [(-1.5, 1.5)] * (n - 1) + [(-0.4, 0.4)]
+        else:
+            bounds = [(-3, 3)] * (2 * (n - 1)) + [(-2, 2), (-0.4, 0.4)]
 
         res = minimize(
             self._neg_log_likelihood,
@@ -279,7 +297,7 @@ class DixonColes:
         self.params_ = {
             "att": dict(zip(self.teams, att)),
             "def": dict(zip(self.teams, deff)),
-            "home_adv": float(home_adv),
+            "home_adv": dict(zip(self.teams, home_adv)) if self.team_home_adv else float(home_adv),
             "rho": float(rho),
         }
         return self
@@ -287,10 +305,13 @@ class DixonColes:
     def rating(self, team):
         return self.params_["att"][team], self.params_["def"][team]
 
+    def _home_adv_for(self, team):
+        return self.params_["home_adv"][team] if self.team_home_adv else self.params_["home_adv"]
+
     def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS):
         att_h, def_h = self.rating(home_team)
         att_a, def_a = self.rating(away_team)
-        home_adv = self.params_["home_adv"]
+        home_adv = self._home_adv_for(home_team)
         rho = self.params_["rho"]
 
         lam = np.exp(home_adv + att_h + def_a)
@@ -336,11 +357,14 @@ class EnsembleModel:
 # 4. Promoted-team baseline ratings (18th-place historical average)
 # ---------------------------------------------------------------------------
 
-def eighteenth_place_baseline(training_data: pd.DataFrame, model: DixonColes):
+def eighteenth_place_baseline(training_data: pd.DataFrame, model: DixonColes, new_teams=None):
     """Average the fitted (att, def) of the team that finished 18th in each
     training season, to use as a baseline for teams with no recent top-flight
-    data (freshly promoted clubs)."""
-    atts, defs = [], []
+    data (freshly promoted clubs). If the model uses per-team home advantage
+    and `new_teams` is given, also assigns those teams the averaged 18th-
+    place home-advantage value (there'd otherwise be no home_adv entry for
+    them at all)."""
+    atts, defs, homes = [], [], []
     for code in training_data["SeasonCode"].unique():
         season_df = training_data[training_data["SeasonCode"] == code]
         if len(season_df) < 300:  # skip a partial in-progress season
@@ -350,6 +374,14 @@ def eighteenth_place_baseline(training_data: pd.DataFrame, model: DixonColes):
         a, d = model.rating(eighteenth)
         atts.append(a)
         defs.append(d)
+        if model.team_home_adv:
+            homes.append(model.params_["home_adv"][eighteenth])
+
+    if model.team_home_adv and new_teams:
+        base_home = float(np.mean(homes))
+        for t in new_teams:
+            model.params_["home_adv"][t] = base_home
+
     return float(np.mean(atts)), float(np.mean(defs))
 
 
@@ -449,7 +481,7 @@ def build_model_and_fixtures(verbose: bool = True):
 
     if new_teams:
         for m in (model_xg, model_goals):
-            base_att, base_def = eighteenth_place_baseline(training_data, m)
+            base_att, base_def = eighteenth_place_baseline(training_data, m, new_teams)
             for t in new_teams:
                 m.params_["att"][t] = base_att
                 m.params_["def"][t] = base_def
