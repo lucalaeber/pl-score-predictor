@@ -26,17 +26,10 @@ import pandas as pd
 
 from model import load_real_fixtures
 from backtest import run_ensemble_backtest, compute_match_metrics
+from teams import CODES
 
 TARGET_CODE = "2627"
 N_TRAIN = 5  # keep in sync with model.py's TRAIN_SEASON_CODES length
-
-CODES = {
-    "Arsenal": "ARS", "Aston Villa": "AVL", "Bournemouth": "BOU", "Brentford": "BRE",
-    "Brighton": "BHA", "Chelsea": "CHE", "Coventry": "COV", "Crystal Palace": "CRY",
-    "Everton": "EVE", "Fulham": "FUL", "Hull": "HUL", "Ipswich": "IPS", "Leeds": "LEE",
-    "Liverpool": "LIV", "Man City": "MCI", "Man United": "MUN", "Newcastle": "NEW",
-    "Nott'm Forest": "NFO", "Sunderland": "SUN", "Tottenham": "TOT",
-}
 
 
 def main():

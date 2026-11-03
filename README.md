@@ -7,10 +7,10 @@ for the real 2026-27 season (all 380 fixtures).
 
 ## What it does
 
-1. **Data ingestion** — downloads 2023-24, 2024-25, and 2025-26 Premier
-   League match results directly from football-data.co.uk as CSV (via
-   pandas), and separately reads the in-progress 2026-27 season file just to
-   determine this season's real 20-team membership (promotions/relegations).
+1. **Data ingestion** — downloads the five seasons 2021-22 to 2025-26
+   (`TRAIN_SEASON_CODES` in `model.py`) from football-data.co.uk as CSV (via
+   pandas), plus the in-progress 2026-27 season, which also supplies this
+   season's real 20-team membership (promotions/relegations).
 2. **Expected goals (xG)** — merges in per-match xG from Understat.com
    (`understat.py`) for the same fixtures, and also folds in the current
    season's played matches (which already include actual goals). Attack,
@@ -30,10 +30,13 @@ for the real 2026-27 season (all 380 fixtures).
    Backtesting showed the two make different kinds of mistakes and combining
    them beats either alone on log loss/Brier in every season tested — see
    the backtesting section below.
-5. **Promoted-team baseline** — teams with no recent top-flight history are
-   assigned the average rating of the team that finished 18th in each of the
-   training seasons (their own 2026-27 matches so far are too few to fit a
-   reliable rating directly, so they aren't used for this).
+5. **Promoted clubs** — a club with no recent top-flight history starts from
+   the average rating of the team that finished 18th in each training season.
+   Its own 2026-27 results are then blended in: a second fit puts the club in
+   the model with a Gaussian prior pulling its ratings toward that baseline
+   (sd `PROMOTED_PRIOR_SD` = 0.3). Early on the baseline dominates; as
+   matches accumulate the club's own results take over. This replaced an
+   all-or-nothing switch — see `midseason_backtest.py` below.
 6. **Fixture list** — the real official 2026-27 schedule
    (`fixtures_2026_27_raw.json`), not a simulated round-robin. Cross-checked
    against actual recorded 2026-27 results for gameweeks 1-2 (exact match).
@@ -45,6 +48,18 @@ for the real 2026-27 season (all 380 fixtures).
    fixture per run from that fixture's own probability grid, aggregated into
    expected points, expected final position, and title/top-4/relegation
    odds per team.
+9. **Next gameweek, injury-adjusted** (`next_gameweek.py`, `injuries.py`) —
+   live injury/suspension/doubt news from the free Fantasy Premier League API
+   scales down each side's expected goals by the share of its attacking output
+   (xG + xA) expected to be missing. **Experimental**: attack only (no free
+   signal for defensive importance), and the effect size is an assumption (a
+   substitute replaces half of a missing player's output) that can't be
+   backtested, because no free source keeps historical injury news.
+   `injury_effect.py` checks the assumption against this season's matches: the
+   data is consistent with it (and, if anything, suggests a larger effect) but
+   with ~180 team-matches it can't pin it down. In practice the adjustment moves
+   win probabilities by a few points where a key attacker is out and rarely
+   changes a predicted scoreline.
 
 ## Usage
 
@@ -54,7 +69,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 python model.py              # -> predictions_2026_2027.csv
 python simulate_season.py    # -> projected_table_2026_2027.csv
+python track_record.py       # -> track_record_2026_2027.csv, site/track_record.json
+python next_gameweek.py      # -> next_gameweek.csv, site/next_gameweek.json
 ```
+
+Understat data for completed seasons is cached in `data_cache/` (gitignored)
+after the first successful fetch, and requests have timeouts and retries, so
+an Understat outage only blocks a run that needs a season it hasn't cached yet
+(an in-progress season falls back to its stale cache with a warning).
+`python next_gameweek.py --goals-only` skips Understat entirely, for
+development while it's unreachable; its output comes from a simplified model
+and must not be published as the real thing (the site flags such data).
 
 `predictions_2026_2027.csv` columns:
 
@@ -142,28 +167,77 @@ real final table (rank correlation, points error, top-4/relegation hit rate).
   hyperparameters are a property of the data window, not universal
   constants.
 
+### Mid-season replay (`midseason_backtest.py`)
+
+The pre-season backtest can't answer "how should this season's own results
+be used as it goes on?", so `midseason_backtest.py` replays five past seasons
+(2021-22 to 2025-26, each with a newly promoted club the model had never
+seen) at the point the live model is at in November: train on 5 prior seasons
+plus the first 90 matches, score the remaining 290. Run on goals-only fits,
+since it was built while Understat was unreachable; average log loss:
+
+| variant | log loss | promoted-club matches |
+|---|---|---|
+| prior seasons only | 1.0090 | 1.0237 |
+| + in-season matches (old production) | 0.9996 | 1.0234 |
+| ... weighted ×2 / ×3 / ×5 | 0.9977 / 0.9980 / 1.0007 | 1.0253 / 1.0274 / 1.0314 |
+| promoted clubs blended, prior sd 0.15 / **0.3** / 0.6 | 0.9979 / **0.9978** / 0.9992 | 1.0111 / **1.0093** / 1.0227 |
+
+- In-season results are clearly worth using (1.0090 → 0.9996).
+- Up-weighting them beyond the time decay isn't: ×2 is noise-level, ×5 is worse.
+- Blending a promoted club's own results with the baseline beat the old
+  all-or-nothing approach at every prior strength, overall and on that club's
+  matches. The gain is small and the promoted-club subset (145 matches) is
+  about one standard error, so treat it as "consistent and conceptually
+  right", not "proven large". Adopted at sd 0.3 (`PROMOTED_PRIOR_SD`).
+- Rerun it with Understat reachable to see whether the xG fits agree.
+
+### Injury effect check (`injury_effect.py`)
+
+Using FPL per-match minutes and xG for the 180 team-matches played so far, it
+measures how much a team's xG falls relative to a pre-season model's
+expectation per unit of attacking output (share of team xG + xA) missing.
+Both a minutes-based and a stricter "regulars who barely played" definition
+land above the assumed effect (8.9% and 11.6% xG per 10% missing, versus 8.1%
+assumed; 90% intervals roughly 4-13% and 6-17%). One structural point came
+out of it: xG + xA counts every chance twice (shooter and creator), so a
+player's share of xG + xA overstates his share of the team's chances by about
+1.6x; `injuries.py` measures that ratio from the data instead of assuming it.
+The substitute-replacement share (0.5) was set after looking at these
+results, so "inside the interval" is a consistency check, not independent
+validation.
+
 ## Interactive view
 
-`site/index.html` has three tabs: Fixtures (all 380 matches by gameweek,
-searchable), Projected Table (the season simulation), and Track Record
-(pre-season predictions vs. actual results for matches played so far —
-built from `track_record.py`). It reads `site/predictions.json`,
-`site/table.json`, and `site/track_record.json`; regenerate those from the
-CSVs after re-running the model or track_record.py — see the export
-snippet in the commit that added the projected-table view, or ask for it
-again if needed.
+`site/index.html` has four tabs: Fixtures (all 380 matches by gameweek,
+searchable), Next Gameweek (the injury-adjusted view, from
+`next_gameweek.py`; the tab only appears when `site/next_gameweek.json`
+exists), Projected Table (the season simulation), and Track Record
+(pre-season predictions vs. actual results for matches played so far, from
+`track_record.py`). It reads `site/predictions.json`, `site/table.json`,
+`site/track_record.json` and `site/next_gameweek.json`; regenerate those from
+the CSVs after re-running the scripts — see the export snippet in the commit
+that added the projected-table view, or ask for it again if needed.
 
 ## Notes
 
-- Data sources: football-data.co.uk (results, current-season team list) and
+- Data sources: football-data.co.uk (results, current-season team list),
   Understat.com (xG, via its same-origin JSON endpoint — see `understat.py`
-  for details; no login or paid access involved).
+  for details; no login or paid access involved) and the Fantasy Premier
+  League API (live player availability; free, public JSON).
 - Per-team home advantage (`DixonColes(teams, team_home_adv=True)`,
   `backtest.py`'s `home-adv` mode) was tried and tested inconclusive: it won
   clearly in one backtested season, lost in another, and was a wash in the
   third — average log loss across all three barely moved (1.0029 → 1.0025).
   Not worth ~19 extra parameters for that, so it's left as an opt-in feature
   rather than the default.
+- Player-level squad ratings (rating a squad from its players' xG/xA, to
+  capture summer transfers and promoted clubs) were considered and left
+  unbuilt on purpose: FPL only has current-season totals plus prior *Premier
+  League* seasons (so a promoted club's new signings have no history), and
+  there are no free historical squad snapshots to backtest against. It would
+  need Understat's per-season player data to be testable across past seasons;
+  the idea is worth revisiting once that's reachable.
 - Free options not yet tried: a short-term "current form" component (e.g.
   an Elo-style adjustment from the last 5-6 games) blended with the long-run
   rating, which might capture momentum/injuries the smooth exponential

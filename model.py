@@ -44,6 +44,13 @@ XI = 0.002           # exponential time-decay rate (per day) -- tuned via
                       # cited literature value) scored worse on all three
 MAX_GOALS = 6         # truncate scoreline grid at 6-6
 
+# Promoted clubs' ratings are pulled toward the 18th-place baseline with a
+# Gaussian prior of this sd (prior_strength = 1 / (2 * sd^2)), so their own
+# results this season are blended with the baseline rather than replacing it.
+# midseason_backtest.py replayed five past seasons at match 90: sd 0.15, 0.3
+# and 0.6 all beat the old all-or-nothing approach; 0.3 was best overall.
+PROMOTED_PRIOR_SD = 0.3
+
 COLS = ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"]
 
 
@@ -87,11 +94,12 @@ def attach_understat_xg(df: pd.DataFrame, code: str) -> pd.DataFrame:
     return merged
 
 
-def load_training_data() -> pd.DataFrame:
+def load_training_data(with_xg: bool = True) -> pd.DataFrame:
     frames = []
     for code in TRAIN_SEASON_CODES:
         season_df = load_season(code)
-        season_df = attach_understat_xg(season_df, code)
+        if with_xg:
+            season_df = attach_understat_xg(season_df, code)
         frames.append(season_df)
 
     historical_teams = set()
@@ -102,10 +110,11 @@ def load_training_data() -> pd.DataFrame:
     # -- football-data.co.uk already publishes HxG/AxG for it directly, and
     # the exponential time decay in DixonColes.fit will naturally weight
     # these most heavily since they're the most recent matches available.
-    # Matches involving a team with no prior top-flight history (a fresh promotion)
-    # are excluded here: 3-4 games isn't enough to fit that team's own
-    # rating reliably, so it keeps the 18th-place historical baseline
-    # instead (see eighteenth_place_baseline / build_model_and_fixtures).
+    # Matches involving a club with no prior top-flight history (a fresh
+    # promotion) are left out of this first pass: the club has no rating yet,
+    # so the baseline is derived from the known clubs alone. They're brought
+    # back in a second, shrinkage-regularised fit -- see
+    # load_promoted_club_matches / build_model_and_fixtures.
     current_played = load_season(CURRENT_SEASON_CODE, want_xg=True)
     current_played = current_played[
         current_played["HomeTeam"].isin(historical_teams)
@@ -116,6 +125,16 @@ def load_training_data() -> pd.DataFrame:
     data = pd.concat(frames, ignore_index=True)
     data = data.sort_values("Date").reset_index(drop=True)
     return data
+
+
+def load_promoted_club_matches(historical_teams) -> pd.DataFrame:
+    """Played matches this season involving a club with no prior history."""
+    current_played = load_season(CURRENT_SEASON_CODE, want_xg=True)
+    unknown = ~(
+        current_played["HomeTeam"].isin(historical_teams)
+        & current_played["AwayTeam"].isin(historical_teams)
+    )
+    return current_played[unknown]
 
 
 def load_current_season_teams() -> list:
@@ -212,7 +231,8 @@ class DixonColes:
             rho = x[2 * (n - 1) + 1]
         return att, deff, home_adv, rho
 
-    def _neg_log_likelihood(self, x, home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2):
+    def _neg_log_likelihood(self, x, home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2,
+                            prior=None, prior_strength=0.0):
         att, deff, home_adv, rho = self._unpack(x)
 
         home_adv_term = home_adv[home_idx] if self.team_home_adv else home_adv
@@ -248,9 +268,21 @@ class DixonColes:
         if l2 > 0:
             nll += l2 * (np.sum(att ** 2) + np.sum(deff ** 2))
 
+        # Gaussian prior pulling specific teams toward given (att, def) values
+        # -- used for promoted clubs, whose own few matches are blended with
+        # the generic 18th-place baseline instead of replacing it outright.
+        if prior is not None and prior_strength > 0:
+            p_idx, att0, def0 = prior
+            nll += prior_strength * (np.sum((att[p_idx] - att0) ** 2) + np.sum((deff[p_idx] - def0) ** 2))
+
         return nll
 
-    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI, use_xg: bool = True, l2: float = 0.0):
+    def fit(self, matches: pd.DataFrame, as_of: dt.datetime, xi: float = XI, use_xg: bool = True, l2: float = 0.0,
+            extra_weight=None, prior=None, prior_strength: float = 0.0):
+        """extra_weight: optional per-match multiplier (aligned with `matches`)
+        on top of the time decay. prior: optional {team: (att0, def0)} with
+        prior_strength -- a Gaussian pull of those teams' ratings toward the
+        given values (strength = 1 / (2 * sigma^2) for a prior sd of sigma)."""
         home_idx = matches["HomeTeam"].map(self.idx).to_numpy()
         away_idx = matches["AwayTeam"].map(self.idx).to_numpy()
         hg_actual = matches["FTHG"].to_numpy()
@@ -266,6 +298,17 @@ class DixonColes:
         days_ago = (as_of - matches["Date"]).dt.days.to_numpy().astype(float)
         days_ago = np.clip(days_ago, 0, None)
         weights = np.exp(-xi * days_ago)
+        if extra_weight is not None:
+            weights = weights * np.asarray(extra_weight, dtype=float)
+
+        prior_arrays = None
+        if prior:
+            teams_in = [t for t in prior if t in self.idx]
+            prior_arrays = (
+                np.array([self.idx[t] for t in teams_in]),
+                np.array([prior[t][0] for t in teams_in]),
+                np.array([prior[t][1] for t in teams_in]),
+            )
 
         n = self.n
         if self.team_home_adv:
@@ -285,7 +328,8 @@ class DixonColes:
         res = minimize(
             self._neg_log_likelihood,
             x0,
-            args=(home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2),
+            args=(home_idx, away_idx, hg_fit, ag_fit, hg_actual, ag_actual, weights, l2,
+                  prior_arrays, prior_strength),
             method="L-BFGS-B",
             bounds=bounds,
             options={"maxiter": 1000, "maxfun": 50000, "ftol": 1e-10},
@@ -308,14 +352,16 @@ class DixonColes:
     def _home_adv_for(self, team):
         return self.params_["home_adv"][team] if self.team_home_adv else self.params_["home_adv"]
 
-    def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS):
+    def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS, lam_scale=1.0, mu_scale=1.0):
+        """lam_scale / mu_scale multiply the home / away expected goals before
+        the grid is built (used for situational adjustments such as injuries)."""
         att_h, def_h = self.rating(home_team)
         att_a, def_a = self.rating(away_team)
         home_adv = self._home_adv_for(home_team)
         rho = self.params_["rho"]
 
-        lam = np.exp(home_adv + att_h + def_a)
-        mu = np.exp(att_a + def_h)
+        lam = np.exp(home_adv + att_h + def_a) * lam_scale
+        mu = np.exp(att_a + def_h) * mu_scale
 
         goals = np.arange(0, max_goals + 1)
         factorials = np.array([math.factorial(g) for g in goals])
@@ -345,9 +391,9 @@ class EnsembleModel:
         self.model_a = model_a
         self.model_b = model_b
 
-    def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS):
-        matrix_a, lam_a, mu_a = self.model_a.score_matrix(home_team, away_team, max_goals)
-        matrix_b, lam_b, mu_b = self.model_b.score_matrix(home_team, away_team, max_goals)
+    def score_matrix(self, home_team, away_team, max_goals=MAX_GOALS, lam_scale=1.0, mu_scale=1.0):
+        matrix_a, lam_a, mu_a = self.model_a.score_matrix(home_team, away_team, max_goals, lam_scale, mu_scale)
+        matrix_b, lam_b, mu_b = self.model_b.score_matrix(home_team, away_team, max_goals, lam_scale, mu_scale)
         matrix = (matrix_a + matrix_b) / 2
         matrix /= matrix.sum()
         return matrix, (lam_a + lam_b) / 2, (mu_a + mu_b) / 2
@@ -446,17 +492,24 @@ def load_real_fixtures(path: str = FIXTURES_FILE) -> pd.DataFrame:
 # 6. Reusable pipeline entry point (fit model + load real fixtures)
 # ---------------------------------------------------------------------------
 
-def build_model_and_fixtures(verbose: bool = True):
+def build_model_and_fixtures(verbose: bool = True, goals_only: bool = False):
     """Download data, fit the Dixon-Coles model (with promoted-team baseline
     ratings applied), and load the real 380-fixture schedule. Shared by
     model.py (single-match predictions) and simulate_season.py (full-season
-    Monte Carlo projection) so both stay consistent."""
+    Monte Carlo projection) so both stay consistent.
+
+    goals_only=True skips Understat entirely and returns just the goals-fit
+    model. It exists for development while Understat is unreachable; its
+    numbers differ from the published xG+goals ensemble and shouldn't be
+    published as if they were the same model."""
     def log(msg):
         if verbose:
             print(msg)
 
-    log("Downloading historical Premier League data (2023-24 to 2025-26)...")
-    training_data = load_training_data()
+    if goals_only:
+        log("*** GOALS-ONLY MODE: no Understat xG; not the published ensemble ***")
+    log(f"Loading historical Premier League data ({TRAIN_SEASON_CODES[0]} to {TRAIN_SEASON_CODES[-1]})...")
+    training_data = load_training_data(with_xg=not goals_only)
     log(f"  {len(training_data)} matches loaded.")
 
     log("Downloading current-season data to determine 2026-27 team list...")
@@ -471,24 +524,50 @@ def build_model_and_fixtures(verbose: bool = True):
     log("Fitting Dixon-Coles models (xG-fit and goals-fit, MLE with time decay)...")
     as_of = training_data["Date"].max() + pd.Timedelta(days=1)
 
-    model_xg = DixonColes(trained_teams)
-    model_xg.fit(training_data, as_of=as_of, xi=XI, use_xg=True)
-    log(f"  xG-fit:    home_adv={model_xg.params_['home_adv']:.3f}  rho={model_xg.params_['rho']:.3f}")
+    fitted = []
+    if not goals_only:
+        model_xg = DixonColes(trained_teams)
+        model_xg.fit(training_data, as_of=as_of, xi=XI, use_xg=True)
+        log(f"  xG-fit:    home_adv={model_xg.params_['home_adv']:.3f}  rho={model_xg.params_['rho']:.3f}")
+        fitted.append(model_xg)
 
     model_goals = DixonColes(trained_teams)
     model_goals.fit(training_data, as_of=as_of, xi=XI, use_xg=False)
     log(f"  goals-fit: home_adv={model_goals.params_['home_adv']:.3f}  rho={model_goals.params_['rho']:.3f}")
+    fitted.append(model_goals)
 
     if new_teams:
-        for m in (model_xg, model_goals):
-            base_att, base_def = eighteenth_place_baseline(training_data, m, new_teams)
-            for t in new_teams:
-                m.params_["att"][t] = base_att
-                m.params_["def"][t] = base_def
-                m.teams.append(t)
-        log(f"  18th-place baseline applied for: {new_teams}")
+        # Second pass: put the promoted clubs in the model and refit with their
+        # own results so far, each pulled toward that variant's own 18th-place
+        # baseline. Early in the season the prior dominates (about the baseline
+        # alone); as matches accumulate the club's own results take over.
+        promoted_matches = load_promoted_club_matches(set(trained_teams))
+        full_data = pd.concat([training_data, promoted_matches], ignore_index=True)
+        full_data = full_data.sort_values("Date").reset_index(drop=True)
+        as_of_full = full_data["Date"].max() + pd.Timedelta(days=1)
+        strength = 1 / (2 * PROMOTED_PRIOR_SD ** 2)
 
-    model = EnsembleModel(model_xg, model_goals)
+        refitted = []
+        for m in fitted:
+            use_xg = m is not model_goals
+            base_att, base_def = eighteenth_place_baseline(training_data, m, new_teams)
+            m2 = DixonColes(trained_teams + new_teams)
+            m2.fit(full_data, as_of=as_of_full, xi=XI, use_xg=use_xg,
+                   prior={t: (base_att, base_def) for t in new_teams}, prior_strength=strength)
+            refitted.append(m2)
+        fitted = refitted
+        if not goals_only:
+            model_xg, model_goals = fitted
+        else:
+            model_goals = fitted[0]
+
+        for t in new_teams:
+            played = int(((promoted_matches["HomeTeam"] == t) | (promoted_matches["AwayTeam"] == t)).sum())
+            att, deff = model_goals.rating(t)
+            log(f"  {t}: {played} matches this season blended with the 18th-place baseline "
+                f"(goals-fit att {att:+.2f}, def {deff:+.2f}; baseline att {base_att:+.2f}, def {base_def:+.2f})")
+
+    model = model_goals if goals_only else EnsembleModel(model_xg, model_goals)
 
     log("Loading real 2026-27 fixture list (380 matches)...")
     fixtures = load_real_fixtures()

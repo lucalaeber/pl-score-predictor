@@ -1,4 +1,5 @@
 <!doctype html>
+<meta charset="utf-8">
 <title>2026-27 Match Predictions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,6 +63,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     background: var(--bg);
@@ -352,6 +354,48 @@
   .hitchip.hit { background: color-mix(in srgb, var(--zone-top4) 18%, var(--surface-2)); color: var(--zone-top4); }
   .hitchip.miss { background: var(--surface-2); color: var(--text-muted); }
 
+  .ng-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .ng-card .match { border-top: none; }
+  .ng-score { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .ng-was { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; color: var(--text-muted); }
+  .ng-notes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 14px;
+    padding: 0 16px 11px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .ng-notes b { color: var(--text); font-weight: 500; }
+  .ng-delta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    border-radius: 5px;
+    padding: 2px 7px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .ng-delta.up { background: color-mix(in srgb, var(--zone-top4) 18%, var(--surface-2)); color: var(--zone-top4); }
+  .ng-delta.down { background: color-mix(in srgb, var(--zone-releg) 16%, var(--surface-2)); color: var(--zone-releg); }
+  .ng-banner {
+    border: 1px solid var(--zone-releg);
+    color: var(--zone-releg);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    margin-bottom: 12px;
+  }
+
   .table-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -477,14 +521,16 @@
     <span class="eyebrow">Static Score Predictor &middot; Dixon-Coles MLE</span>
     <h1>Premier League 2026&ndash;27 Predictions</h1>
     <p class="subtitle">
-      Every one of the season's 380 fixtures, scored by a Dixon-Coles attack/defense
-      model fit on 2023&ndash;24 through 2025&ndash;26 results (exponential time decay,
-      &xi;=0.0065/day). The fixture list itself is the real official 2026&ndash;27
-      schedule &mdash; not a simulated round robin.
+      Every one of the season's 380 fixtures, scored by Dixon-Coles attack/defense
+      models fit on expected goals and on actual goals, trained on 2021&ndash;22
+      through 2025&ndash;26 plus this season's results so far (exponential time
+      decay, &xi;=0.002/day). The fixture list itself is the real official
+      2026&ndash;27 schedule &mdash; not a simulated round robin.
     </p>
     <div class="model-stats" id="modelStats"></div>
     <div class="tabs" role="tablist">
       <button type="button" id="tabFixtures" class="active" role="tab" aria-selected="true">Fixtures</button>
+      <button type="button" id="tabNext" role="tab" aria-selected="false" hidden>Next Gameweek</button>
       <button type="button" id="tabTable" role="tab" aria-selected="false">Projected Table</button>
       <button type="button" id="tabTrack" role="tab" aria-selected="false">Track Record</button>
     </div>
@@ -498,7 +544,7 @@
     <span><span class="dot" style="background:var(--home)"></span>Home win</span>
     <span><span class="dot" style="background:var(--draw)"></span>Draw</span>
     <span><span class="dot" style="background:var(--away)"></span>Away win</span>
-    <span><span class="baseline-flag" style="padding:1px 4px;">NEW</span>&nbsp;No recent PL history &mdash; 18th-place baseline rating</span>
+    <span><span class="baseline-flag" style="padding:1px 4px;">NEW</span>&nbsp;Newly promoted &mdash; rating blends the 18th-place baseline with this season's results</span>
   </div>
 
   <main id="list"></main>
@@ -523,6 +569,23 @@
     </p>
   </section>
 
+  <section id="nextView" hidden>
+    <p class="subtitle" style="max-width:66ch; padding-bottom:6px;">
+      Gameweek <strong id="ngEvent"></strong>, shown as the model normally predicts it and
+      adjusted for players expected to miss it (injuries, suspensions, doubts), using live
+      news from the free Fantasy Premier League API as of <span id="ngStamp"></span>.
+    </p>
+    <p class="table-note" style="padding-top:0;">
+      Experimental. Only attack is adjusted (missing defenders and goalkeepers aren't
+      modelled), and it assumes a substitute replaces half of a missing player's output.
+      This season's matches are consistent with that but too few to pin it down, and
+      unlike the rest of the model it can't be backtested on past seasons, because
+      no free source keeps historical injury news.
+    </p>
+    <div class="ng-banner" id="ngBanner" hidden></div>
+    <div id="ngList"></div>
+  </section>
+
   <section id="trackView" hidden>
     <p class="subtitle" style="max-width:66ch; padding-bottom:14px;">
       What this model would have called <em>before</em> the season kicked off,
@@ -537,20 +600,25 @@
 
   <footer class="page">
     Model: home advantage and low-score correlation (&rho;) fitted by maximum
-    likelihood; Coventry and Hull (no recent top-flight data) are rated at
-    the average attack/defense strength of each training season's 18th-place
-    finisher. Fixture list cross-checked against recorded 2026&ndash;27 results
-    for gameweeks 1&ndash;2 (exact match). Source data:
-    <a href="https://www.football-data.co.uk/englandm.php" target="_blank" rel="noopener">football-data.co.uk</a>.
+    likelihood. Coventry and Hull (no recent top-flight data) start from the
+    average attack/defense strength of each training season's 18th-place
+    finisher, and their own results this season are blended in as they
+    accumulate. Fixture list cross-checked against recorded 2026&ndash;27
+    results for gameweeks 1&ndash;2 (exact match). Source data:
+    <a href="https://www.football-data.co.uk/englandm.php" target="_blank" rel="noopener">football-data.co.uk</a>,
+    <a href="https://understat.com" target="_blank" rel="noopener">Understat</a> (xG) and the
+    <a href="https://fantasy.premierleague.com" target="_blank" rel="noopener">Fantasy Premier League</a> API (availability).
   </footer>
 </div>
 
 <script>
 (async function () {
-  const [predRes, tableRes, trackRes] = await Promise.all([
+  const [predRes, tableRes, trackRes, nextData] = await Promise.all([
     fetch("predictions.json"),
     fetch("table.json"),
     fetch("track_record.json"),
+    // optional: the Next Gameweek tab simply stays hidden if this is missing
+    fetch("next_gameweek.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ]);
   const rows = await predRes.json();
   const table = await tableRes.json();
@@ -571,7 +639,7 @@
     ["Fixtures", rows.length],
     ["Gameweeks", gws.length],
     ["Avg. home win", homeAdvWinRate + "%"],
-    ["Training seasons", "3"],
+    ["Training seasons", "5"],
   ];
   document.getElementById("modelStats").innerHTML = stats.map(
     ([label, value]) => `<div class="stat"><span class="label">${label}</span><span class="value">${value}</span></div>`
@@ -592,13 +660,13 @@
       <span class="side home">
         <span class="code">${r.hc}</span>
         <span class="name">${r.h}</span>
-        ${r.hb ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+        ${r.hb ? '<span class="baseline-flag" title="Newly promoted — rating blends the 18th-place baseline with this season’s results">NEW</span>' : ""}
       </span>
       <span class="score">${r.score}</span>
       <span class="side away">
         <span class="code">${r.ac}</span>
         <span class="name">${r.a}</span>
-        ${r.ab ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+        ${r.ab ? '<span class="baseline-flag" title="Newly promoted — rating blends the 18th-place baseline with this season’s results">NEW</span>' : ""}
       </span>
       <span class="probs">
         <span class="bar">
@@ -689,7 +757,7 @@
       <span class="team">
         <span class="code">${t.code}</span>
         <span class="name">${t.team}</span>
-        ${t.new ? '<span class="baseline-flag" title="No recent PL history — 18th-place baseline rating">NEW</span>' : ""}
+        ${t.new ? '<span class="baseline-flag" title="Newly promoted — rating blends the 18th-place baseline with this season’s results">NEW</span>' : ""}
       </span>
       <span class="pts">${t.pts}</span>
       <span class="gd">${t.gd > 0 ? "+" : ""}${t.gd}</span>
@@ -752,42 +820,80 @@
   }
   document.getElementById("trackList").appendChild(trackFrag);
 
-  // tab switching
-  const tabFixtures = document.getElementById("tabFixtures");
-  const tabTable = document.getElementById("tabTable");
-  const tabTrack = document.getElementById("tabTrack");
-  const fixturesToolbar = document.getElementById("fixturesToolbar");
-  const fixturesLegend = document.getElementById("fixturesLegend");
-  const tableView = document.getElementById("tableView");
-  const trackView = document.getElementById("trackView");
-  const allTabs = [tabFixtures, tabTable, tabTrack];
-
-  function activateTab(tab) {
-    for (const t of allTabs) {
-      t.classList.toggle("active", t === tab);
-      t.setAttribute("aria-selected", t === tab ? "true" : "false");
+  // next gameweek (injury-adjusted)
+  const tabNext = document.getElementById("tabNext");
+  if (nextData && nextData.fixtures.length) {
+    tabNext.hidden = false;
+    document.getElementById("ngEvent").textContent = nextData.event;
+    document.getElementById("ngStamp").textContent = new Date(nextData.generated)
+      .toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    if (nextData.mode.includes("development")) {
+      const banner = document.getElementById("ngBanner");
+      banner.hidden = false;
+      banner.textContent = "Development data from a simplified goals-only model, not the published model.";
     }
+    const signed = (v) => (v > 0 ? "+" : v < 0 ? "&minus;" : "") + Math.abs(v).toFixed(1);
+    const ngFrag = document.createDocumentFragment();
+    for (const f of nextData.fixtures) {
+      const card = document.createElement("div");
+      card.className = "ng-card";
+      const a = f.adjusted, b = f.base;
+      const when = f.kickoff
+        ? new Date(f.kickoff).toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit" })
+        : "";
+      const absent = (code, players, pct) => players.length
+        ? `<span><b>${code}</b> missing ${pct.toFixed(0)}% of attack: ` +
+          players.map((p) => `${p.name} (${p.p_out >= 1 ? "out" : Math.round(p.p_out * 100) + "% to miss"}, ${(p.share * 100).toFixed(0)}%)`).join(", ") + `</span>`
+        : "";
+      const shift = a.ph - b.ph;
+      const delta = Math.abs(shift) >= 0.5
+        ? `<span class="ng-delta ${shift > 0 ? "up" : "down"}">home win ${signed(shift)} pts vs. unadjusted</span>`
+        : "";
+      card.innerHTML = `
+        <div class="match">
+          <span class="date">${when}</span>
+          <span class="side home"><span class="code">${f.hc}</span><span class="name">${f.home}</span></span>
+          <span class="ng-score"><span class="score">${a.score}</span>${a.score !== b.score ? `<span class="ng-was">was ${b.score}</span>` : ""}</span>
+          <span class="side away"><span class="code">${f.ac}</span><span class="name">${f.away}</span></span>
+          <span class="probs">
+            <span class="bar">
+              <span class="h" style="width:${a.ph}%"></span>
+              <span class="d" style="width:${a.pd}%"></span>
+              <span class="a" style="width:${a.pa}%"></span>
+            </span>
+            <span class="problabels">
+              <span title="${f.home} win"><b>${a.ph.toFixed(0)}</b>H</span>
+              <span title="Draw"><b>${a.pd.toFixed(0)}</b>D</span>
+              <span title="${f.away} win"><b>${a.pa.toFixed(0)}</b>A</span>
+            </span>
+          </span>
+        </div>
+        ${(f.home_players.length || f.away_players.length || delta) ? `<div class="ng-notes">
+          ${absent(f.hc, f.home_players, f.home_missing)}${absent(f.ac, f.away_players, f.away_missing)}${delta}
+        </div>` : ""}
+      `;
+      ngFrag.appendChild(card);
+    }
+    document.getElementById("ngList").appendChild(ngFrag);
   }
-  function showFixtures() {
-    activateTab(tabFixtures);
-    fixturesToolbar.hidden = false; fixturesLegend.hidden = false; list.hidden = false;
-    applySearch();
-    tableView.hidden = true; trackView.hidden = true;
+
+  // tab switching
+  const views = {
+    fixtures: { tab: document.getElementById("tabFixtures"),
+                els: [document.getElementById("fixturesToolbar"), document.getElementById("fixturesLegend"), list] },
+    next:     { tab: tabNext, els: [document.getElementById("nextView")] },
+    table:    { tab: document.getElementById("tabTable"), els: [document.getElementById("tableView")] },
+    track:    { tab: document.getElementById("tabTrack"), els: [document.getElementById("trackView")] },
+  };
+  function showView(name) {
+    for (const [key, v] of Object.entries(views)) {
+      const active = key === name;
+      v.tab.classList.toggle("active", active);
+      v.tab.setAttribute("aria-selected", active ? "true" : "false");
+      for (const el of v.els) el.hidden = !active;
+    }
+    if (name === "fixtures") applySearch(); else emptyMsg.hidden = true;
   }
-  function showTable() {
-    activateTab(tabTable);
-    fixturesToolbar.hidden = true; fixturesLegend.hidden = true; list.hidden = true;
-    emptyMsg.hidden = true;
-    tableView.hidden = false; trackView.hidden = true;
-  }
-  function showTrack() {
-    activateTab(tabTrack);
-    fixturesToolbar.hidden = true; fixturesLegend.hidden = true; list.hidden = true;
-    emptyMsg.hidden = true;
-    tableView.hidden = true; trackView.hidden = false;
-  }
-  tabTrack.addEventListener("click", showTrack);
-  tabFixtures.addEventListener("click", showFixtures);
-  tabTable.addEventListener("click", showTable);
+  for (const [key, v] of Object.entries(views)) v.tab.addEventListener("click", () => showView(key));
 })();
 </script>
